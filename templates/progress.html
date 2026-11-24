@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<section id="progress" class="on">
+ <p class="eb" data-hi="आपकी यात्रा">Your journey</p>
+ <h2 class="big" data-hi="छोटे साइन। असली प्रगति।">Small signs. Real progress.</h2>
+ <p class="sub">A calm overview of the practice you’ve made part of your week.</p>
+ <div class="stats" style="margin:0 0 20px"><div class="card stat"><b id="pMaster">0</b><span>Sign master</span><small id="pLvl"></small></div><div class="card stat"><b id="pAvg">0%</b><span>Average quiz score</span><small id="pQ"></small></div><div class="card stat"><b id="pTime">0h</b><span>Active learning time</span><small>This month</small></div></div>
+ <div class="g2" style="margin:0 0 20px"><div class="card"><p class="eb">Saved</p><h2 style="font-size:28px">Favorite signs</h2><div id="pFav"></div></div><div class="card"><p class="eb">Recent</p><h2 style="font-size:28px">Activities</h2><div id="pAct"></div></div></div>
+ <div class="card" style="margin-bottom:20px"><p class="eb">Studio</p><h2 style="font-size:28px">Call history</h2><div id="pCalls"></div></div>
+ <div class="card"><p class="eb">Last 7 days</p><h2 style="font-size:30px">Your practice rhythm</h2><div class="chart" id="chart"></div></div>
+ <div class="badges" id="badges"></div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+{% raw %}
+/* Progress & history page */
+function renderStats(){const n=24+done.size,acc=Math.round((820+qa.c*100)/(10+qa.t)),g=Math.min(today.size,5);
+ const v=[3,6,4,9,5,12,8+today.size],mx=Math.max(...v),dn=["Thu","Fri","Sat","Sun","Mon","Tue","Today"];
+ $("#chart").innerHTML=v.map((x,i)=>`<div class="${i==6?"t":""}"><i style="height:${x/mx*85}%"></i>${dn[i]}</div>`).join("");
+ const B=[["🌱","First sign",1],["🔥","6-day streak",1],["🤟","10 signs learned",n>=30],["🎯","90% accuracy",acc>=90],["⭐","Daily goal met",g>=5]];
+ $("#badges").innerHTML=B.map(b=>`<div class="card bd ${b[2]?"":"lock"}"><s>${b[0]}</s><b>${b[1]}</b><br><small style="color:var(--mute)">${b[2]?"Earned":"Keep going"}</small></div>`).join("")}
+function renderExtra(){const n=24+done.size,acc=Math.round((820+qa.c*100)/(10+qa.t));
+ $("#pMaster").textContent=n;$("#pLvl").textContent=n>=50?"Level 4":n>=30?"Level 3":"Level 2";
+ $("#pAvg").textContent=acc+"%";$("#pQ").textContent=(10+qa.t)+" questions";$("#pTime").textContent=Math.floor(mins/60)+"h "+mins%60+"m";
+ $("#pFav").innerHTML=fav.size?[...fav].map(id=>`<div class="li"><div class="row" style="flex-wrap:nowrap"><div class="mini hand">${HS(id)}</div><div><b>${nm(sg(id))}</b><br><small>${sg(id).c}</small></div></div><div class="row" style="flex-wrap:nowrap"><button class="lk" data-p="${id}">Practice →</button><button class="fav on" data-f="${id}" style="position:static" aria-label="Remove from favorites">★</button></div></div>`).join(""):'<p class="sub" style="margin:12px 0 0">No favorites yet. Tap ☆ on a sign in the library or press Save sign on the Practice page.</p>';
+ const A=[...log].reverse().slice(0,3).concat([{t:"Completed Everyday greetings quiz",d:"Yesterday"},{t:"Learned Thank you",d:"Yesterday"},{t:"Hit a 6-day streak",d:"Today"}]).slice(0,6);
+ $("#pAct").innerHTML=A.map(a=>`<div class="li"><span>${a.t}</span><small>${a.d}</small></div>`).join("");
+ $("#pCalls").innerHTML=calls.map(c=>`<div class="li"><div><b>${c.w}</b><br><small>${c.d}</small></div><small>${c.m}</small></div>`).join("")}
+HOOK.tick.push(renderExtra);HOOK.lang.push(renderExtra);HOOK.sl.push(renderExtra);HOOK.fav.push(renderExtra);
+renderStats();renderExtra();
+boot();
+{% endraw %}
+</script>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<section id="settings" class="on"><p class="eb">Make it yours</p><h2 class="big" style="font-size:clamp(30px,5vw,46px)">Settings &amp; about</h2>
+ <div class="g2"><div class="card"><h3 style="font-size:26px">Personalization</h3>
+  <div class="set"><div>Display name</div><input class="inp" id="sName" style="max-width:180px"></div>
+  <div class="set"><div>Theme</div><select id="sTheme"><option value="auto">System</option><option value="light">Light</option><option value="dark">Dark</option></select></div>
+  <div class="set"><div>Default sign language</div><select id="sSl"><option value="isl">ISL</option><option value="asl">ASL</option></select></div>
+  <h3 style="font-size:26px;margin-top:26px">Accessibility</h3>
+  <div class="set"><div>Larger text</div><button class="sw" data-sw="big" role="switch" aria-label="Larger text"></button></div>
+  <div class="set"><div>High contrast<small>Stronger borders and text</small></div><button class="sw" data-sw="hc" role="switch" aria-label="High contrast"></button></div>
+  <div class="set"><div>Reduce motion</div><button class="sw" data-sw="rm" role="switch" aria-label="Reduce motion"></button></div>
+  <div class="set"><div>Always show finger labels</div><button class="sw" data-sw="fl" role="switch" aria-label="Finger labels"></button></div>
+  <div class="set"><div>Speak recognized signs aloud</div><button class="sw" data-sw="sp" role="switch" aria-label="Speak signs"></button></div></div>
+ <div class="card"><h3 style="font-size:26px">About ASL Connect</h3><p style="color:var(--mute)">ASL Connect is SanketAI’s video-call space inside Live Sign Studio. Share a call code, sign naturally, and read or hear each other’s signs as they are recognized.</p><p style="color:var(--mute)">SanketAI teaches Indian Sign Language and American Sign Language with guided practice, quick quizzes and a friendly AI buddy.</p><p style="color:var(--mute)">Your camera video stays on your device.</p><small style="color:var(--mute)">Version 1.0 · Preview</small></div></div></section>
+{% endblock %}
+{% block scripts %}
+<script>
+{% raw %}
+/* Settings & about page */
+$("#sName").oninput=e=>{cfg.name=e.target.value;applyCfg()};$("#sTheme").onchange=e=>{cfg.theme=e.target.value;applyCfg()};$("#sSl").onchange=e=>setSl(e.target.value);
+document.addEventListener("click",e=>{const w=e.target.closest("[data-sw]");if(w){cfg[w.dataset.sw]=cfg[w.dataset.sw]?0:1;applyCfg()}});
+HOOK.cfg.push(()=>{
+ $$("[data-sw]").forEach(b=>{const on=!!cfg[b.dataset.sw];b.classList.toggle("on",on);b.setAttribute("aria-checked",on)});
+ $("#sName").value=cfg.name;$("#sTheme").value=cfg.theme;$("#sSl").value=sl});
+boot();
+{% endraw %}
+</script>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<section id="buddy" class="on"><p class="eb">Gemini-powered · static preview</p><h2 class="big" style="font-size:clamp(30px,5vw,46px)">AI Buddy</h2><p class="sub">Ask about signs, ISL vs ASL, or practice tips. Replies are scripted for now.</p>
+ <div class="card"><div class="chat" id="chat"></div><div class="pick" id="chips"></div><div class="row" style="margin-top:14px;flex-wrap:nowrap"><input class="inp" id="bi" placeholder="Ask your buddy…" aria-label="Message"><button class="btn" id="bs">Send</button></div></div></section>
+{% endblock %}
+{% block scripts %}
+<script>
+{% raw %}
+/* AI Buddy page */
+/* AI buddy (static; swap ask() body for a Gemini API call later) */
+const BR=[[/hello|hi\b/,"Hello! Open your hand near your temple and move it outward. Want to practice it with Mira?"],[/isl|asl|differ/,"ISL and ASL are separate languages. ISL uses both hands more often, while ASL is mostly one-handed with its own fingerspelling."],[/tip|practi|improve/,"Practice 5 signs a day, face the camera, keep both shoulders visible, and use slow motion first."],[/quiz|test/,"Go to Practice and try the Quick check. I’ll cheer you on!"],[/call|connect/,"Open Live Sign Studio, switch to Video call, share your code and press Call."]];
+function bot(t){const d=document.createElement("div");d.className="m th";d.textContent=t;$("#chat").append(d);$("#chat").scrollTop=1e9}
+function ask(t){const d=document.createElement("div");d.className="m yo";d.textContent=t;$("#chat").append(d);
+ /* TODO: replace with Gemini API call */ const r=BR.find(x=>x[0].test(t.toLowerCase()));setTimeout(()=>bot(r?r[1]:"Great question! This is a static preview, so I can only answer a few topics. Try asking about tips, ISL vs ASL, or video calls."),500)}
+$("#bs").onclick=()=>{const v=$("#bi").value.trim();if(v){$("#bi").value="";ask(v)}};$("#bi").onkeydown=e=>{if(e.key=="Enter")$("#bs").click()};
+bot("Hi, I’m your SanketAI buddy ✦ What would you like to learn today?");
+$("#chips").innerHTML=["Practice tips","ISL vs ASL","How do I make a call?"].map(x=>`<button data-ask="${x}">${x}</button>`).join("");
+document.addEventListener("click",e=>{const c=e.target.closest("[data-ask]");if(c)ask(c.dataset.ask)});
+boot();
+{% endraw %}
+</script>
+{% endblock %}

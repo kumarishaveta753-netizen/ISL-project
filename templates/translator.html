@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block content %}
+<section id="translator" class="wide on">
+ <p class="eb">Live Sign Studio</p>
+ <h2 class="big" style="font-size:clamp(30px,5vw,46px)">Recognize signs</h2>
+ <p class="sub">Show your signs to the camera and read them as text. Video never leaves your device.</p>
+ 
+ <div id="recP"><div class="card" style="padding:16px">
+  <div class="studio"><div class="cam" id="cam"><div id="camMsg"><h3 data-hi="आपका निजी कैमरा प्रीव्यू">Your private camera preview</h3><p>Position your upper body and both hands inside the frame.</p></div></div>
+  <div class="interp" id="interp" aria-label="Indian Sign Language interpreter">
+   <div class="row" style="justify-content:space-between;flex-wrap:nowrap"><p class="eb" style="margin:0" data-hi="आईएसएल दुभाषिया">ISL interpreter · Mira</p><span class="pill" id="ipill"><span class="rd"></span><span id="ipillt">Mic off</span></span></div>
+   <div class="istage mira" id="istage" aria-live="polite"></div>
+   <h3 id="icap" aria-live="polite">Waiting for speech…</h3>
+   <div class="gl" id="igl" aria-label="Sign sequence"></div>
+   <p class="ih" id="iheard"></p>
+   <div class="row"><button class="btn" id="imic">Start listening</button><button class="btn o" id="irep">Replay</button><button class="btn o" id="islow">Slow</button></div>
+   <div class="row" style="flex-wrap:nowrap"><input class="inp" id="itxt" placeholder="Or type what was said…" aria-label="Type a sentence to sign"><button class="btn o" id="isend">Sign it</button></div>
+   <small style="color:var(--mute)">Speech is converted to text by your browser’s speech service. Signs play in order as a sentence.</small>
+  </div>
+  </div>
+  <div class="out"><div><p class="eb" style="margin:0">Translation · <span id="tl">English</span></p><h2 id="tr">Your translation will appear here</h2><small style="color:var(--mute)">Live preview is private. Translation samples run in guided demo mode.</small></div>
+   <div class="row"><button class="btn o" id="demo">Try a sample</button><button class="btn" id="camBtn">Start camera</button></div></div>
+ </div></div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+{% raw %}
+/* Live Sign Studio page */
+let stream=null;
+$("#camBtn").onclick=async()=>{const b=$("#camBtn");if(stream){stream.getTracks().forEach(t=>t.stop());stream=null;$("#cam video")?.remove();$("#camMsg").style.display="";b.textContent="Start camera";return}
+ try{stream=await navigator.mediaDevices.getUserMedia({video:true});const v=document.createElement("video");v.autoplay=v.muted=v.playsInline=true;v.srcObject=stream;$("#cam").prepend(v);$("#camMsg").style.display="none";b.textContent="Stop camera"}
+ catch(e){toast("Camera is blocked. Allow access in your browser settings, then try again.")}};
+$("#demo").onclick=()=>{const seq=["hello","thanks","friend"];let i=0;$("#tr").textContent="";(function n(){if(i>=seq.length){speak($("#tr").textContent);return}$("#tr").textContent+=(i?", ":"")+nm(sg(seq[i]));i++;setTimeout(n,700)})()};
+/* ===== Speech → ISL interpreter =====
+   1) mic → text (Web Speech API)  2) text → ISL-style gloss  3) gloss → signs played in sequence.
+   To use verified ISL clips, add them here: ISL_VIDEOS.hello="videos/isl/hello.mp4". Missing/failed clips fall back to Mira. */
+const ISL_VIDEOS={};
+const SS=$("#istage");let Q=[],busy=0,slow=1,lastG=null,logged=0,rec=null,listening=0;
+const wait=ms=>new Promise(r=>setTimeout(r,ms*slow));
+const lab=g=>(g.id?nm(sg(g.id)):g.w).toUpperCase();
+function chips(g,i){$("#igl").innerHTML=g.map((x,j)=>`<span class="gc${x.id?"":" nx"}${j==i?" on":""}${j<i?" dn":""}">${lab(x)}</span>`).join("")}
+function clip(u){return new Promise(res=>{const v=document.createElement("video");v.src=u;v.muted=v.playsInline=v.autoplay=true;v.playbackRate=1/slow;let d=0;const f=ok=>{if(!d){d=1;res(ok)}};v.onended=()=>f(1);v.onerror=()=>f(0);setTimeout(()=>f(0),15000);SS.replaceChildren(v)})}
+async function show(g){const c=$("#icap");if(!g.id){c.textContent=g.w+" · no sign yet";await wait(600);return}
+ c.textContent=nm(sg(g.id));if(ISL_VIDEOS[g.id]&&await clip(ISL_VIDEOS[g.id]))return;SS.innerHTML=mira(g.id);await wait(2000)}
+async function run(){if(busy)return;busy=1;while(Q.length){const g=Q.shift();for(let i=0;i<g.length;i++){chips(g,i);await show(g[i])}chips(g,g.length);await wait(500)}busy=0;$("#icap").textContent="Waiting for speech…"}
+function enqueue(t){t=t.trim();if(!t)return;$("#iheard").textContent="Heard: "+t;const g=gloss(t);
+ if(!g.length){toast("No signs to show for that sentence yet.");return}lastG=g;Q.push(g);if(!logged){logged=1;addLog("Used the speech-to-sign interpreter")}run()}
+function ui(){$("#imic").textContent=listening?"Stop listening":"Start listening";$("#ipill").classList.toggle("on",!!listening);$("#ipillt").textContent=listening?"Listening":"Mic off"}
+function stopMic(){listening=0;try{rec&&rec.stop()}catch(e){}ui()}
+function startMic(){if(!SR)return toast("Speech recognition isn’t available in this browser. Type below instead.");
+ rec=new SR();rec.continuous=true;rec.interimResults=true;rec.lang=L()?"hi-IN":"en-IN";
+ rec.onresult=e=>{let it="";for(let i=e.resultIndex;i<e.results.length;i++){const r=e.results[i];r.isFinal?enqueue(r[0].transcript):it+=r[0].transcript}if(it)$("#iheard").textContent="Hearing: "+it+"…"};
+ rec.onend=()=>{if(listening){rec.lang=L()?"hi-IN":"en-IN";try{rec.start()}catch(e){}}};
+ rec.onerror=e=>{if(e.error=="not-allowed"||e.error=="service-not-allowed"){stopMic();toast("Microphone is blocked. Allow access in your browser settings, then try again.")}};
+ try{rec.start();listening=1;ui()}catch(e){toast("Couldn’t start the microphone.")}}
+$("#imic").onclick=()=>listening?stopMic():startMic();
+$("#irep").onclick=()=>{if(lastG){Q.push(lastG);run()}else toast("Nothing to replay yet.")};
+$("#islow").onclick=e=>{slow=slow==1?1.8:1;e.target.textContent=slow==1?"Slow":"Normal speed"};
+$("#isend").onclick=()=>{enqueue($("#itxt").value);$("#itxt").value=""};$("#itxt").onkeydown=e=>{if(e.key=="Enter")$("#isend").click()};
+addEventListener("pagehide",stopMic);
+SS.innerHTML=mira("hello");
+HOOK.lang.push(()=>{$("#tl").textContent=L()?"हिन्दी":"English";});
+boot();
+{% endraw %}
+</script>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<section id="learn" class="on">
+ <p class="eb" data-hi="सीखें">Sign library</p>
+ <h2 class="big" style="font-size:clamp(30px,5vw,46px)" id="learnH">Learn ISL</h2>
+ <p class="sub" style="margin-bottom:18px">Tap a sign to practice it with Mira. Star the ones you want to revisit.</p>
+ <div class="pillsw" data-lbl style="width:max-content;margin-bottom:14px"><button class="on" data-sl="isl">ISL library</button><button data-sl="asl">ASL library</button></div>
+ <div class="tabs" id="tabs"></div>
+ <div class="lib" id="lib"></div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+{% raw %}
+/* Learn ISL / ASL page */
+function renderTabs(){const cs=["All","Greetings","Essentials","Daily life","Saved"];
+ $("#tabs").innerHTML=cs.map(c=>`<button class="tab ${c==cat?"on":""}" data-c="${c}">${c==="All"?(L()?"सभी साइन":"All signs"):c}</button>`).join("")}
+function renderLib(){const f=S.filter(s=>(cat==="All"||(cat==="Saved"?fav.has(s.id):s.c===cat))&&(s.n+s.hi).toLowerCase().includes(q));
+ $("#lib").innerHTML=f.length?f.map((s,i)=>`<article class="sc"><div class="ic ${s.b}"><div class="hand" style="width:100px">${HS(s.id)}</div></div><div class="tx"><p class="eb" style="margin:0 0 4px">${s.c}${done.has(s.id)?'<span class="tag">Learned</span>':""}</p><h3>${nm(s)}</h3><p>${hw(s)}</p><button class="lk" data-p="${s.id}">${L()?"अभ्यास करें":"Practice sign"} →</button></div><button class="fav ${fav.has(s.id)?"on":""}" data-f="${s.id}" aria-label="Save ${s.n}">${fav.has(s.id)?"★":"☆"}</button></article>`).join(""):`<p class="sub">No signs match yet. Try a different word, or clear the search.</p>`}
+document.addEventListener("click",e=>{const t=e.target.closest("[data-c]");if(t){cat=t.dataset.c;renderTabs();renderLib()}});
+HOOK.lang.push(renderTabs,renderLib);HOOK.fav.push(renderLib);HOOK.search.push(renderLib);
+HOOK.sl.push(()=>{$("#learnH").textContent="Learn "+sl.toUpperCase();renderLib()});
+renderTabs();renderLib();
+if(q){const i=$("#q");i.focus();i.setSelectionRange(i.value.length,i.value.length)}
+boot();
+{% endraw %}
+</script>
+{% endblock %}

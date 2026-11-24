@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% block content %}
+<section id="call" class="wide on">
+ <div class="row" style="justify-content:space-between;align-items:flex-end"><div><p class="eb">ASL Connect</p>
+ <h2 class="big" style="font-size:clamp(30px,5vw,46px)">Video call</h2></div><span class="pill" id="rpill"><span class="rd"></span><span id="rpillt">Recognition off</span></span></div>
+ <p class="sub">Call a friend, sign naturally, and read or hear their signs live.</p>
+ 
+ <div class="pillsw" id="cmode" style="width:max-content;margin-bottom:16px"><button class="on" data-ct="people">People &amp; chat</button><button data-ct="code">Call code</button></div>
+ <div id="peopleP"><div class="pgrid2">
+  <div class="card">
+   <div id="reg"><h3>Create your profile</h3><p class="sub" style="margin:8px 0 14px">Pick a username so friends can find you. (Demo sign-in: no password yet.)</p>
+    <div class="row" style="flex-direction:column;align-items:stretch"><input class="inp" id="regn" placeholder="Your name" aria-label="Your name"><input class="inp" id="regu" placeholder="username (letters, numbers, _)" aria-label="Username"><button class="btn" id="regb">Join SanketAI</button></div></div>
+   <div id="pmain" style="display:none">
+    <div class="row" style="justify-content:space-between"><span class="row" style="flex-wrap:nowrap"><span id="meav"></span><b id="meu"></b></span><span class="row"><label class="lk" style="cursor:pointer">Change photo<input type="file" id="pic" accept="image/*" hidden></label><button class="lk" id="logo">Log out</button></span></div>
+    <input class="inp" id="usr" style="width:100%;margin:12px 0 4px" placeholder="Search friends by username or name…" aria-label="Search users">
+    <div id="ures"></div>
+    <h3 style="margin-top:18px">Requests</h3><div id="reqs"></div>
+    <h3 style="margin-top:18px">Friends</h3><div id="frs"></div></div>
+  </div>
+  <div class="card">
+   <div id="chEmpty"><h3>Your messages</h3><p class="sub" style="margin:8px 0 0">Search for a friend, send a request, and once they accept you can chat and call here.</p></div>
+   <div id="chBox" style="display:none">
+    <div class="row" style="justify-content:space-between"><h3 id="chName"></h3><span class="row"><button class="btn o" id="cAud">☎ Audio</button><button class="btn" id="cVid">▶ Video</button></span></div>
+    <div class="cvw" id="cvw"><video id="rv" autoplay playsinline></video><div class="cvo" id="cvo"></div><video id="lv" autoplay playsinline muted></video><div class="capo" id="capo" aria-live="polite"></div></div>
+    <div class="row" id="cctl" style="display:none;margin-bottom:10px"><button class="btn o" id="cmute">Mute mic</button><button class="btn o" id="ccam">Camera off</button><button class="btn" id="cend" style="background:#c0392b;border-color:#c0392b">End call</button></div>
+    <div class="isl" id="isl"><b style="font-size:12px">ISL</b><button class="tg" id="tSign">🤟 My signs → captions</button><button class="tg" id="tMic">🎙 My speech → captions</button><button class="tg" id="tShow">👁 Show signs for their words</button><button class="tg" id="tSay">🔊 Read captions aloud</button></div>
+    <div class="sgp" id="sgp"><div id="cslot"></div><div><b id="sgw"></b><br><small style="color:var(--mute)">Sign for what they said</small></div></div>
+    <div class="msgs" id="pm" style="margin-top:12px"></div>
+    <div class="row" style="flex-wrap:nowrap"><input class="inp" id="pmi" placeholder="Message…" aria-label="Message"><button class="btn" id="pms">Send</button></div>
+   </div></div>
+ </div></div>
+ <div id="callP" style="display:none"><div class="callg">
+  <div class="card" style="padding:16px"><div class="vid" id="vid"><div id="vMsg"><h3>Not in a call</h3><p style="opacity:.75;font-size:13px">Enter a code and press Call.</p></div><div class="pip" id="pip" style="display:none"><div><b style="font:700 28px 'Playfair Display',serif">GX</b><br>Friend</div></div></div>
+   <p id="cst" style="color:var(--mute);margin:10px 0 8px;font-size:13px">Ready</p>
+   <div class="row"><button class="btn o" id="mute">Mute mic</button><button class="btn o" id="camoff">Camera off</button><button class="btn" id="endc" style="background:#c0392b;border-color:#c0392b">End call</button></div></div>
+  <div class="card"><b>Your call code</b><div class="code"><span id="mycode"></span><button class="btn o" id="cpy">Copy</button></div>
+   <b>Call someone</b><div class="row" style="margin:6px 0 16px;flex-wrap:nowrap"><input class="inp" id="peer" placeholder="gx-xxxxxx" aria-label="Call code"><button class="btn" id="callb">Call</button></div>
+   <b>Signs during the call</b><p style="color:var(--mute);font-size:13px;margin:4px 0 10px">Their signs appear below and are spoken to you.</p>
+   <button class="btn" id="recog">Start recognition</button><div class="msgs" id="cm"></div></div>
+ </div></div>
+</section>
+<div class="inc" id="inc" role="alertdialog"><span id="incN"></span><button class="btn" id="incA" style="background:var(--moss);border-color:var(--moss)">Accept</button><button class="btn" id="incD" style="background:#c0392b;border-color:#c0392b">Decline</button></div>
+{% endblock %}
+{% block scripts %}
+<script>
+{% raw %}
+/* Video call page (people & chat, call code, ISL inside calls) */
+/* video call (simulated) */
+let cs=null,inCall=false,t0=0,rt=null,cstream=null;const code="gx-"+Math.random().toString(36).slice(2,8);$("#mycode").textContent=code;
+$("#cpy").onclick=()=>{try{navigator.clipboard.writeText(code)}catch(e){}toast("Call code copied")};
+const msg=(w,t)=>{const d=document.createElement("div");d.className="m "+(w?"yo":"th");d.innerHTML=`<small>${w?"You signed":"They signed"}</small>${t}`;$("#cm").append(d);$("#cm").scrollTop=1e9;if(!w&&cfg.sp)speak(t)};
+$("#callb").onclick=async()=>{const p=$("#peer").value.trim();if(!/^gx-\w{4,}/.test(p))return toast("Enter a valid code like gx-abc123");
+ if(inCall)return;inCall=true;t0=Date.now();$("#vMsg").innerHTML="<h3>Connected</h3><p style='opacity:.75;font-size:13px'>with "+p+" (demo)</p>";$("#pip").style.display="grid";$("#cst").innerHTML='<span class="rd g"></span>Connected';
+ try{cstream=await navigator.mediaDevices.getUserMedia({video:true});const v=document.createElement("video");v.autoplay=v.muted=v.playsInline=true;v.srcObject=cstream;$("#vid").prepend(v)}catch(e){toast("Camera blocked, continuing without video.")}};
+$("#endc").onclick=()=>{if(!inCall)return;inCall=false;clearInterval(rt);rt=null;setPill(0);$("#recog").textContent="Start recognition";cstream?.getTracks().forEach(t=>t.stop());$("#vid video")?.remove();$("#pip").style.display="none";$("#vMsg").innerHTML="<h3>Call ended</h3>";$("#cst").textContent="Ready";
+ calls.unshift({w:$("#peer").value.trim(),d:"Just now",m:Math.max(1,Math.round((Date.now()-t0)/60000))+" min"});sv("calls",calls.slice(0,8));calls=calls.slice(0,8);addLog("Finished a video call");toast("Call ended")};
+$("#mute").onclick=e=>{const o=e.target.textContent=="Mute mic";e.target.textContent=o?"Unmute":"Mute mic"};
+$("#camoff").onclick=e=>{const o=e.target.textContent=="Camera off";e.target.textContent=o?"Camera on":"Camera off";cstream?.getVideoTracks().forEach(t=>t.enabled=!o)};
+function setPill(on){$("#rpill").classList.toggle("on",on);$("#rpillt").textContent=on?"Recognizing":"Recognition off"}
+$("#recog").onclick=e=>{if(rt){clearInterval(rt);rt=null;setPill(0);e.target.textContent="Start recognition";return}
+ setPill(1);if(!inCall)toast("Demo: start a call for realistic results.");e.target.textContent="Stop recognition";
+ rt=setInterval(()=>{const x=nm(S[Math.floor(Math.random()*S.length)]);msg(Math.random()>.5,x)},2500)};
+[[0,"PLEASE"],[1,"PLEASE"],[0,"HELLO"],[1,"HELLO"]].forEach(x=>msg(x[0],x[1]));
+/* ===== Connect & Communicate =====
+   DB (localStorage) and SIG (BroadcastChannel) are local stand-ins that work between tabs of one browser.
+   Replace dbg/dbs and sig/onmessage with REST + WebSocket calls to go live across devices. */
+let PEER=null;
+const online=u=>{const x=dbg().users[u];return !!(x&&x.demo)||Date.now()-(pres()[u]||0)<15000};
+const rel=(d,u)=>d.conns.find(c=>(c.a==ME&&c.b==u)||(c.a==u&&c.b==ME));
+const av=u=>{const x=dbg().users[u]||{name:"?"};return `<div class="av">${x.pic?`<img src="${x.pic}" alt="">`:esc(x.name.slice(0,2).toUpperCase())}<i class="dot${online(u)?" on":""}"></i></div>`};
+let ps="";
+setInterval(()=>{beat();if(!ME)return;const k=Object.keys(dbg().users).map(u=>+online(u)).join("");if(k!=ps){ps=k;rPeople()}},5000);
+function rPeople(){ME=sessionStorage.getItem("sk_me");$("#reg").style.display=ME?"none":"";$("#pmain").style.display=ME?"":"none";if(!ME){rChat();return}
+ const d=dbg(),q=$("#usr").value.trim().toLowerCase();$("#meu").textContent="@"+ME;$("#meav").innerHTML=av(ME);
+ const row=(u,b)=>{const x=d.users[u];return `<div class="li"><div class="row" style="flex-wrap:nowrap">${av(u)}<div><b>${esc(x.name)}</b><br><small>@${esc(u)} · ${esc(x.lvl||"Beginner")} · <span class="on-t${online(u)?" on":""}">${online(u)?"Online":"Offline"}</span></small></div></div>${b}</div>`};
+ const none=t=>`<small style="color:var(--mute)">${t}</small>`;
+ $("#ures").innerHTML=q?(Object.keys(d.users).filter(u=>u!=ME&&(u.includes(q)||d.users[u].name.toLowerCase().includes(q))).map(u=>{const r=rel(d,u);return row(u,!r?`<button class="btn o" data-cn="${u}">Add friend</button>`:r.s=="ok"?`<button class="lk" data-chat="${u}">Message →</button>`:`<small>${r.a==ME?"Request sent":"Respond below"}</small>`)}).join("")||none("No one found for “"+esc(q)+"”")):"";
+ $("#reqs").innerHTML=d.conns.filter(c=>c.b==ME&&c.s=="pending").map(c=>row(c.a,`<span class="row" style="flex-wrap:nowrap"><button class="btn" data-ac="${c.a}">Accept</button><button class="btn o" data-dc="${c.a}">Decline</button></span>`)).join("")||none("No pending requests");
+ $("#frs").innerHTML=d.conns.filter(c=>c.s=="ok"&&(c.a==ME||c.b==ME)).map(c=>row(c.a==ME?c.b:c.a,`<span class="row" style="flex-wrap:nowrap;gap:10px"><button class="lk" data-chat="${c.a==ME?c.b:c.a}">Chat →</button><button class="lk" title="Audio call" data-qc="${c.a==ME?c.b:c.a}" data-qv="0">☎</button><button class="lk" title="Video call" data-qc="${c.a==ME?c.b:c.a}" data-qv="1">▶</button></span>`)).join("")||none("No friends yet. Search above to connect.");rChat()}
+function rChat(){const on=ME&&PEER&&dbg().users[PEER];$("#chEmpty").style.display=on?"none":"";$("#chBox").style.display=on?"":"none";if(!on)return;const d=dbg();
+ $("#chName").innerHTML=`<span class="row" style="flex-wrap:nowrap;gap:10px">${av(PEER)}<span>${esc(d.users[PEER].name)}<br><small class="on-t${online(PEER)?" on":""}">@${esc(PEER)} · ${online(PEER)?"Online":"Offline"}</small></span></span>`;
+ $("#pm").innerHTML=d.msgs.filter(m=>(m.f==ME&&m.t==PEER)||(m.f==PEER&&m.t==ME)).map(m=>`<div class="m ${m.f==ME?"yo":"th"}"><small>${new Date(m.ts).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}</small>${m.k?(m.k=="s"?"🤟 ":"🎙 "):""}${esc(m.x)}</div>`).join("")||'<small style="color:var(--mute)">Say hello 👋</small>';$("#pm").scrollTop=1e9}
+$("#regn").value=cfg.name||"";$("#regu").value=(cfg.name||"").toLowerCase().replace(/[^a-z0-9_]/g,"");
+$("#regb").onclick=()=>{const u=$("#regu").value.trim().toLowerCase(),n=$("#regn").value.trim()||u;if(!/^[a-z0-9_]{3,20}$/.test(u))return toast("Username needs 3–20 letters, numbers or _");
+ const d=dbg();if(d.users[u]&&d.users[u].demo)return toast("That username is taken");if(!d.users[u]){d.users[u]={u,name:n,lvl:"Level "+(n.length%3+2)};dbs(d)}sessionStorage.setItem("sk_me",u);ME=u;beat();rPeople();toast("Welcome, @"+u)};
+$("#logo").onclick=()=>{sessionStorage.removeItem("sk_me");PEER=null;rPeople()};$("#usr").oninput=rPeople;
+$("#pic").onchange=e=>{const f=e.target.files[0];if(!f)return;const im=new Image(),u=URL.createObjectURL(f);im.onload=()=>{const c=document.createElement("canvas");c.width=c.height=96;const z=Math.min(im.width,im.height);c.getContext("2d").drawImage(im,(im.width-z)/2,(im.height-z)/2,z,z,0,0,96,96);URL.revokeObjectURL(u);const d=dbg();d.users[ME].pic=c.toDataURL("image/jpeg",.8);dbs(d);rPeople();toast("Profile photo updated")};im.onerror=()=>toast("Couldn’t read that image");im.src=u;e.target.value=""};
+document.addEventListener("click",e=>{const b=e.target.closest("[data-cn],[data-ac],[data-dc],[data-chat],[data-ct],[data-qc]");if(!b)return;const d=dbg(),D=b.dataset;
+ if(D.ct){$$("[data-ct]").forEach(x=>x.classList.toggle("on",x==b));$("#peopleP").style.display=D.ct=="people"?"":"none";$("#callP").style.display=D.ct=="code"?"":"none";return}
+ if(D.qc){PEER=D.qc;rChat();startCall(+D.qv);return}
+ if(D.chat){PEER=D.chat;rChat();return}
+ if(D.cn){d.conns.push({a:ME,b:D.cn,s:"pending"});dbs(d);toast("Request sent to @"+D.cn);if(d.users[D.cn].demo)setTimeout(()=>{const k=dbg();const c=k.conns.find(c=>c.a==ME&&c.b==D.cn);if(c){c.s="ok";dbs(k);rPeople();toast("@"+D.cn+" accepted your request")}},1200)}
+ if(D.ac){const c=d.conns.find(c=>c.a==D.ac&&c.b==ME);if(c)c.s="ok";dbs(d);toast("You’re now connected with @"+D.ac)}
+ if(D.dc){d.conns=d.conns.filter(c=>!(c.a==D.dc&&c.b==ME));dbs(d)}rPeople()});
+const sendM=()=>{const x=$("#pmi").value.trim();if(!x||!PEER)return;const d=dbg();d.msgs.push({f:ME,t:PEER,x,ts:Date.now()});d.msgs=d.msgs.slice(-500);dbs(d);$("#pmi").value="";rChat();if(d.users[PEER].demo)demoReply(PEER)};
+$("#pms").onclick=sendM;$("#pmi").onkeydown=e=>{if(e.key=="Enter")sendM()};
+addEventListener("storage",e=>{if(e.key==DBK)rPeople()});
+/* audio/video calls: WebRTC, signalled over BroadcastChannel (swap for a WebSocket server across devices) */
+const bc="BroadcastChannel" in window?new BroadcastChannel("sk_sig"):null,sig=m=>bc&&bc.postMessage({...m,from:ME});
+let pc=null,ls=null,cpeer=null,cvid=0,pend=[],inv=null,ctm=null;
+async function media(v){try{return await navigator.mediaDevices.getUserMedia({audio:true,video:!!v})}catch(e){if(v){try{toast("Camera unavailable, using audio only.");return await navigator.mediaDevices.getUserMedia({audio:true})}catch(_){}}toast("Allow microphone access to make calls.");return null}}
+function mk(){pc=new RTCPeerConnection({iceServers:[{urls:"stun:stun.l.google.com:19302"}]});ls.getTracks().forEach(t=>pc.addTrack(t,ls));pc.ontrack=e=>{$("#rv").srcObject=e.streams[0]};pc.onicecandidate=e=>e.candidate&&sig({type:"ice",to:cpeer,c:e.candidate});pc.onconnectionstatechange=()=>{if(pc&&pc.connectionState=="failed"){toast("Call connection failed");endCall()}}}
+const flush=async()=>{while(pend.length)await pc.addIceCandidate(pend.shift()).catch(()=>{})};
+function showCall(){$("#isl").style.display="flex";$("#cvw").style.display="block";$("#cctl").style.display="flex";$("#lv").srcObject=ls;$("#lv").style.display=cvid?"":"none";const o=$("#cvo");o.style.display=cvid?"none":"grid";o.textContent=(dbg().users[cpeer]?.name||"?").slice(0,2).toUpperCase();$("#cmute").textContent="Mute mic";$("#ccam").textContent="Camera off"}
+function endCall(remote){stopIsl();if(!remote&&cpeer)sig({type:"end",to:cpeer});clearTimeout(ctm);if(pc)pc.close();pc=null;ls&&ls.getTracks().forEach(t=>t.stop());ls=null;cpeer=null;pend=[];$("#rv").srcObject=null;$("#cvw").style.display="none";$("#cctl").style.display="none"}
+async function startCall(v){if(cpeer||!PEER)return;if(!bc||!window.RTCPeerConnection)return toast("Calling isn’t supported in this browser.");
+ const c=rel(dbg(),PEER);if(!c||c.s!="ok")return toast("Connect with this person first.");
+ if(dbg().users[PEER].demo)return demoCall(v);
+ ls=await media(v);if(!ls)return;cpeer=PEER;cvid=v&&ls.getVideoTracks().length?1:0;showCall();sig({type:"invite",to:cpeer,v:cvid});ctm=setTimeout(()=>{toast("No answer");endCall()},30000)}
+$("#cAud").onclick=()=>startCall(0);$("#cVid").onclick=()=>startCall(1);$("#cend").onclick=()=>endCall();
+$("#cmute").onclick=e=>{const t=ls&&ls.getAudioTracks()[0];if(!t)return;t.enabled=!t.enabled;e.target.textContent=t.enabled?"Mute mic":"Unmute"};
+$("#ccam").onclick=e=>{const t=ls&&ls.getVideoTracks()[0];if(!t)return;t.enabled=!t.enabled;e.target.textContent=t.enabled?"Camera off":"Camera on"};
+$("#incA").onclick=async()=>{const m=inv;inv=null;$("#inc").style.display="none";ls=await media(m.v);if(!ls){sig({type:"decline",to:m.from});return}
+ PEER=m.from;cpeer=m.from;cvid=m.v&&ls.getVideoTracks().length?1:0;mk();showCall();rPeople();go("call");sig({type:"accept",to:m.from})};
+$("#incD").onclick=()=>{sig({type:"decline",to:inv.from});inv=null;$("#inc").style.display="none"};
+if(bc)bc.onmessage=async e=>{const m=e.data;if(!ME||m.to!=ME)return;
+ if(m.type=="invite"){const c=rel(dbg(),m.from);if(cpeer||inv||!c||c.s!="ok")return sig({type:"decline",to:m.from});inv=m;$("#incN").textContent="@"+m.from+" is calling ("+(m.v?"video":"audio")+")";$("#inc").style.display="flex"}
+ else if(m.from!=cpeer&&!(inv&&m.type=="end"&&m.from==inv.from))return;
+ else if(m.type=="cap"){capSay(m.x,0);if(tA)speak(m.x);if(tV&&m.k=="m")showSigns(m.x)}
+ else if(m.type=="decline"){toast("Call declined");endCall(1)}
+ else if(m.type=="accept"){clearTimeout(ctm);mk();const o=await pc.createOffer();await pc.setLocalDescription(o);sig({type:"offer",to:cpeer,s:o})}
+ else if(m.type=="offer"){await pc.setRemoteDescription(m.s);await flush();const a=await pc.createAnswer();await pc.setLocalDescription(a);sig({type:"answer",to:cpeer,s:a})}
+ else if(m.type=="answer"){await pc.setRemoteDescription(m.s);await flush()}
+ else if(m.type=="ice"){pc&&pc.remoteDescription?pc.addIceCandidate(m.c).catch(()=>{}):pend.push(m.c)}
+ else if(m.type=="end"){if(inv&&m.from==inv.from){inv=null;$("#inc").style.display="none"}else{toast("Call ended");endCall(1)}}};
+/* ===== ISL inside calls =====
+   Captions travel as text only (video stays peer-to-peer). Sign recognition: plug your model in via
+   window.ISLRecognizer={start(videoEl,onLabel){},stop(){}}; without it, a demo simulator runs. */
+let tS=0,tM=0,tV=0,tA=0,sRt=null,mRec=null,sq=[],sBusy=0;
+function capSay(x,mine){const o=$("#capo"),e=document.createElement("span");e.className=mine?"me":"";e.textContent=(mine?"You: ":"")+x;o.append(e);while(o.children.length>3)o.firstChild.remove();setTimeout(()=>e.remove(),6000)}
+function emitCap(k,x){if(!cpeer||!x)return;sig({type:"cap",to:cpeer,k,x});capSay(x,1);const d=dbg();d.msgs.push({f:ME,t:cpeer,x,k,ts:Date.now()});d.msgs=d.msgs.slice(-500);dbs(d);rChat()}
+async function showSigns(t){sq.push(...gloss(t).filter(g=>g.id));if(sBusy)return;sBusy=1;$("#sgp").style.display="flex";while(sq.length){const g=sq.shift();$("#cslot").innerHTML=mira(g.id);$("#sgw").textContent=nm(sg(g.id));await new Promise(r=>setTimeout(r,1800))}sBusy=0;setTimeout(()=>{if(!sBusy)$("#sgp").style.display="none"},2500)}
+function stopSign(){clearInterval(sRt);sRt=null;try{window.ISLRecognizer&&ISLRecognizer.stop()}catch(e){}}
+function stopMic2(){try{mRec&&(mRec.onend=null,mRec.stop())}catch(e){}mRec=null}
+function stopIsl(){dts.forEach(clearTimeout);dts=[];tS=tM=tV=tA=0;stopSign();stopMic2();sq=[];$$("#isl .tg").forEach(b=>b.classList.remove("on"));$("#isl").style.display="none";$("#sgp").style.display="none";$("#capo").innerHTML=""}
+const flip=(id,v)=>$(id).classList.toggle("on",!!v);
+$("#tSign").onclick=()=>{if(tS){tS=0;stopSign();flip("#tSign",0);return}
+ if(!cvid)return toast("Turn on video to translate your signs.");tS=1;flip("#tSign",1);
+ if(window.ISLRecognizer)ISLRecognizer.start($("#lv"),l=>emitCap("s",l));
+ else{toast("Demo recognition. Connect your ISL model to go live.");sRt=setInterval(()=>emitCap("s",nm(S[Math.floor(Math.random()*S.length)])),3500)}};
+$("#tMic").onclick=()=>{if(tM){tM=0;stopMic2();flip("#tMic",0);return}
+ if(!SR)return toast("Speech recognition isn’t available in this browser.");
+ const go2=()=>{mRec=new SR();mRec.continuous=true;mRec.lang=L()?"hi-IN":"en-IN";
+  mRec.onresult=e=>{for(let i=e.resultIndex;i<e.results.length;i++)if(e.results[i].isFinal)emitCap("m",e.results[i][0].transcript.trim())};
+  mRec.onend=()=>{if(tM)try{mRec.start()}catch(x){}};
+  mRec.onerror=e=>{if(e.error=="not-allowed"||e.error=="service-not-allowed"){tM=0;flip("#tMic",0);toast("Microphone is blocked. Allow access in your browser settings.")}};
+  try{mRec.start()}catch(x){}};tM=1;flip("#tMic",1);go2()};
+$("#tShow").onclick=()=>{tV=!tV;flip("#tShow",tV)};
+$("#tSay").onclick=()=>{tA=!tA;flip("#tSay",tA)};
+/* ===== Demo friend: lets you try calls + ISL in a single tab ===== */
+let dts=[];
+const DR=["Nice to hear from you! 😊","Let’s practice ISL together.","Can we call later?","Haha, yes! Great."];
+function demoReply(p){setTimeout(()=>{const d=dbg();d.msgs.push({f:p,t:ME,x:DR[Math.floor(Math.random()*DR.length)],ts:Date.now()});dbs(d);if(PEER==p)rChat()},1200)}
+function dcap(k,x){if(!cpeer)return;capSay(x,0);if(tA)speak(x);if(tV&&k=="m")showSigns(x);const d=dbg();d.msgs.push({f:cpeer,t:ME,x,k,ts:Date.now()});dbs(d);rChat()}
+async function demoCall(v){ls=await media(v);if(!ls)return;cpeer=PEER;cvid=v&&ls.getVideoTracks().length?1:0;showCall();$("#cvo").style.display="grid";
+ toast("Demo call: "+dbg().users[PEER].name+" answers automatically");
+ [[1500,"m","Hello! How are you?"],[6000,"s",nm(sg("hello"))],[10500,"m","Do you need any help? Water or food?"],[16000,"s",nm(sg("thanks"))],[21000,"m","Thank you my friend. Sorry I am late."]].forEach(x=>dts.push(setTimeout(()=>dcap(x[1],x[2]),x[0])))}
+beat();rPeople();
+boot();
+{% endraw %}
+</script>
+{% endblock %}

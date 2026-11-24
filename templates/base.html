@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SanketAI – Learn, practice, connect</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body data-page="{{ active }}">
+<div class="app">
+<aside>
+ <div class="brand"><div class="logo"><svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="#e9f0e4" stroke-width="2.2" stroke-linecap="round"><path d="M4 3v16M9 6v13M14 3v16M19 8v9"/></svg></div><div><b>SanketAI</b><small>LEARN · PRACTICE · CONNECT</small></div></div>
+ <div class="wk">WORKSPACE</div>
+ <button class="nav{% if active == 'overview' %} on{% endif %}" data-t="overview" data-href="{{ url_for('overview') }}"><span>⌂</span><span data-hi="अवलोकन">Overview</span></button>
+ <button class="nav{% if active == 'learn' %} on{% endif %}" data-t="learn" data-href="{{ url_for('learn') }}"><span>▤</span><span id="navLearn">Learn ISL</span></button>
+ <button class="nav{% if active == 'translator' %} on{% endif %}" data-t="translator" data-href="{{ url_for('translator') }}"><span>◉</span><span>Live Sign Studio</span></button>
+ <button class="nav{% if active == 'call' %} on{% endif %}" data-t="call" data-href="{{ url_for('call') }}"><span>☎</span><span>Video call</span></button>
+ <button class="nav{% if active == 'practice' %} on{% endif %}" data-t="practice" data-href="{{ url_for('practice') }}"><span>⇅</span><span data-hi="अभ्यास">Practice</span></button>
+ <button class="nav{% if active == 'progress' %} on{% endif %}" data-t="progress" data-href="{{ url_for('progress') }}"><span>▥</span><span>Progress &amp; history</span></button>
+ <button class="nav{% if active == 'buddy' %} on{% endif %}" data-t="buddy" data-href="{{ url_for('buddy') }}"><span>✦</span><span>AI Buddy</span></button>
+ <button class="nav{% if active == 'settings' %} on{% endif %}" data-t="settings" data-href="{{ url_for('settings') }}"><span>⚙</span><span>Settings &amp; about</span></button>
+ <div class="priv"><b data-hi="डिज़ाइन से निजी">Private by design</b><span data-hi="आपका कैमरा वीडियो आपके डिवाइस पर रहता है।">Your camera video stays on your device.</span></div>
+</aside>
+<main>
+<div class="top">
+ <input class="search" id="q" placeholder="Search the sign library" aria-label="Search the sign library">
+ <div class="pillsw" id="slsw" role="group" aria-label="Sign language"><button class="on" data-sl="isl">ISL</button><button data-sl="asl">ASL</button></div>
+ <div class="lang" role="group" aria-label="Language"><button class="on" data-l="en">EN</button><button data-l="hi">हि</button></div>
+ <div class="me"><div class="av" id="av">SK</div><div><b id="uname">Shaveta</b><br><small>Beginner</small></div></div>
+</div>
+
+{% block content %}{% endblock %}
+<footer>SanketAI · Sign language practice · Your camera video stays on your device.</footer>
+</main>
+</div>
+<div class="fabw" id="fabw"><button class="fab" data-t="buddy" aria-label="Open AI Buddy">✦ AI BUDDY</button><button class="fabx" id="fabx" aria-label="Hide AI Buddy button" title="Hide">×</button></div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+{% raw %}
+/* SanketAI – shared code used by every page (data, hands/Mira drawing, navigation, settings, helpers) */
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const SH={open:{f:[1,1,1,1],t:1},flat:{f:[1,1,1,1],t:0},fist:{f:[0,0,0,0],t:0},help:{f:[0,0,0,0],t:1},up:{f:[0,0,0,0],t:2},two:{f:[1,1,0,0],t:0},point:{f:[1,0,0,0],t:0},w:{f:[1,1,1,0],t:0},food:{f:[0,1,1,1],t:1}};
+const S=[
+{id:"hello",n:"Hello",hi:"नमस्ते",c:"Greetings",h:"open",b:"sage",how:"Open your hand near your temple, then move it gently outward."},
+{id:"thanks",n:"Thank you",hi:"धन्यवाद",c:"Greetings",h:"flat",b:"peach",how:"Touch your fingertips near your chin, then move your flat hand forward."},
+{id:"help",n:"Help",hi:"मदद",c:"Essentials",h:"help",b:"sky",how:"Place one hand above the other and lift both hands together."},
+{id:"water",n:"Water",hi:"पानी",c:"Daily life",h:"w",b:"sage",how:"Form a W handshape and bring it gently near your mouth."},
+{id:"yes",n:"Yes",hi:"हाँ",c:"Essentials",h:"up",b:"peach",how:"Make a fist with the thumb up and nod it slightly."},
+{id:"no",n:"No",hi:"नहीं",c:"Essentials",h:"two",b:"sky",how:"Tap two fingers against your thumb, like a small closing beak."},
+{id:"friend",n:"Friend",hi:"दोस्त",c:"Greetings",h:"point",b:"sage",how:"Hook your index fingers together, then switch their places."},
+{id:"sorry",n:"Sorry",hi:"माफ़ करना",c:"Greetings",h:"fist",b:"peach",how:"Make a fist and circle it softly over your chest."},
+{id:"food",n:"Food",hi:"खाना",c:"Daily life",h:"food",b:"sky",how:"Bring your fingers and thumb together toward your mouth."}];
+const LESS=[["Foundations","Everyday greetings",8,10,"sage"],["Essentials","Getting assistance",4,8,"peach"],["Conversation","At the workplace",2,12,"sky"]];
+const ld=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}};
+const sv=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+let cur=sessionStorage.getItem("sk_cur")||"hello",lang=ld("lang","en"),cat="All",q=sessionStorage.getItem("sk_q")||"",step=0,qa=ld("qa",{c:0,t:0}),done=new Set(ld("done",[])),fav=new Set(ld("fav",[])),today=new Set(ld("today",[])),ans=null;
+const L=()=>lang==="hi",nm=s=>L()?s.hi:s.n,sg=id=>S.find(x=>x.id===id);
+if(!S.some(x=>x.id===cur))cur="hello";
+
+/* every page registers its own renderers here, so shared code never touches elements of other pages */
+const HOOK={lang:[],sl:[],cfg:[],fav:[],open:[],tick:[],search:[]},fire=n=>HOOK[n].forEach(f=>f());
+const PAGE=document.body.dataset.page;
+
+/* hand drawing: tapered fingers, joints, nails, palm lines, thumb mound, wrist + cuff */
+const FX=[70,92,114,136],FL=[78,92,82,62],FW=21,LBL=["1","2","3","4"],ANG=[-5,-1,3,8];
+const fp=(x,y,w,b)=>`M${x} ${b}L${x+1.5} ${y+11}Q${x+1.5} ${y} ${x+w/2} ${y}Q${x+w-1.5} ${y} ${x+w-1.5} ${y+11}L${x+w} ${b}Z`;
+function handG(k,cuff){const s=SH[k];let o="",lb="";
+ s.f.forEach((u,i)=>{if(u){const x=FX[i]-FW/2,l=FL[i],y=128-l,j1=y+l*.4,j2=y+l*.72;
+  o+=`<g transform="rotate(${ANG[i]} ${FX[i]} 160)"><path class="sk" d="${fp(x,y,FW,172)}"/><path class="sh" d="M${x+FW-6} ${y+10}L${x+FW} 172H${x+FW-7}Z"/><path class="nl" d="M${x+4.5} ${y+14}V${y+8}Q${x+4.5} ${y+3.5} ${FX[i]} ${y+3.5}Q${x+FW-4.5} ${y+3.5} ${x+FW-4.5} ${y+8}V${y+14}Q${FX[i]} ${y+17} ${x+4.5} ${y+14}Z"/><path class="cr" d="M${x+4} ${j1}q${FW/2-4} 3 ${FW-8} 0M${x+4} ${j2}q${FW/2-4} 3 ${FW-8} 0"/></g>`;
+  lb+=`<g><circle cx="${FX[i]+ANG[i]*.9}" cy="${y-13}" r="9"/><text x="${FX[i]+ANG[i]*.9}" y="${y-9.5}">${LBL[i]}</text></g>`}});
+ o+=`<path class="sk" d="M52 150Q50 126 70 120H132Q152 124 150 150Q153 192 140 216Q133 232 127 240H75Q68 232 62 216Q50 192 52 150Z"/><path class="sh" d="M56 172Q62 205 78 238L66 224Q52 202 56 172Z"/><path class="cr" d="M62 158Q92 146 142 160M86 154Q74 192 96 226M104 190Q124 196 140 186"/>`;
+ s.f.forEach((u,i)=>{if(!u){const x=FX[i]-FW/2;o+=`<rect class="sk" x="${x}" y="108" width="${FW}" height="44" rx="10.5"/><path class="sh" d="M${x+FW-6} 116V148Q${x+FW-3} 152 ${x+FW-9} 152Z"/><path class="cr" d="M${x+4} 126q6.5 3 ${FW-8} 0M${x+4} 140q6.5 3 ${FW-8} 0"/>`}});
+ if(s.t===1){o+=`<g transform="rotate(-40 62 196)"><path class="sk" d="M39 210L42 132Q43 120 54 120Q65 120 66 132L70 210Z"/><path class="nl" d="M46 134V128Q46 123 54 123Q62 123 62 128V134Q54 138 46 134Z"/><path class="cr" d="M44 166q10 4 20 0M43 188q11 4 23 0"/></g>`;lb+=`<g><circle cx="22" cy="150" r="9"/><text x="22" y="153.5">T</text></g>`}
+ else if(s.t===2){o+=`<path class="sk" d="M45 182L46 82Q47 66 59 66Q71 66 72 82L75 182Z"/><path class="nl" d="M51 82V77Q51 71 59 71Q67 71 67 77V82Q59 86 51 82Z"/><path class="cr" d="M49 124q10 4 20 0M48 150q11 4 23 0"/>`;lb+=`<g><circle cx="59" cy="50" r="9"/><text x="59" y="53.5">T</text></g>`}
+ else{o+=`<g transform="rotate(-8 56 172)"><path class="sk" d="M54 184Q54 172 68 172H118Q128 172 128 184Q128 196 118 196H68Q54 196 54 184Z"/><path class="cr" d="M104 176q4 8 0 16"/></g>`}
+ if(cuff)o+=`<rect x="66" y="232" width="70" height="20" rx="4" fill="#f5a623" stroke="#4a2c1f" stroke-width="3"/>`;
+ return `<g class="wave">${o}</g><g class="lb">${lb}</g>`}
+const H=k=>`<svg viewBox="0 -20 200 270" role="img" aria-label="Hand shape for ${sg(k)?.n||k}">${handG(k,1)}</svg>`;
+const HS=id=>H(sg(id).h);
+
+/* Mira: brighter colours, same style; her raised hand shows the current sign */
+function mira(id,pose=-8){const k=sg(id).h,K="#e2a679",O="#4a2c1f",HR="#5b3422",TP="#f5a623";
+return `<svg viewBox="0 0 320 340" role="img" aria-label="Mira demonstrating ${sg(id).n}">
+<circle cx="160" cy="172" r="128" fill="#fff6e8" fill-opacity=".7" stroke="#f2a07a" stroke-opacity=".6" stroke-width="2"/>
+<path d="M92 232Q66 80 160 70Q254 80 228 232Z" fill="${HR}" stroke="#3a2012" stroke-width="3"/>
+<path d="M30 340Q34 262 118 248L202 248Q286 262 290 340Z" fill="${TP}" stroke="${O}" stroke-width="3"/>
+<path d="M60 340Q70 290 118 270M260 340Q250 290 202 270" fill="none" stroke="#ffd36e" stroke-width="5" stroke-linecap="round" opacity=".7"/>
+<path d="M132 250L160 290L188 250" fill="none" stroke="#fff8e6" stroke-width="6" stroke-linejoin="round"/>
+<rect x="140" y="214" width="40" height="44" rx="12" fill="${K}" stroke="${O}" stroke-width="3"/>
+<path d="M232 300Q292 270 284 214" fill="none" stroke="${O}" stroke-width="36" stroke-linecap="round"/><path d="M232 300Q292 270 284 214" fill="none" stroke="${K}" stroke-width="30" stroke-linecap="round"/>
+<circle cx="98" cy="170" r="11" fill="${K}" stroke="${O}" stroke-width="3"/><circle cx="222" cy="170" r="11" fill="${K}" stroke="${O}" stroke-width="3"/>
+<circle cx="98" cy="191" r="5" fill="#ffd36e" stroke="${O}" stroke-width="1.5"/><circle cx="222" cy="191" r="5" fill="#ffd36e" stroke="${O}" stroke-width="1.5"/>
+<ellipse cx="160" cy="165" rx="62" ry="70" fill="${K}" stroke="${O}" stroke-width="3"/>
+<path d="M97 160Q94 88 160 86Q226 88 223 160Q204 116 160 122Q116 116 97 160Z" fill="${HR}" stroke="#3a2012" stroke-width="3"/>
+<path d="M98 138Q160 96 222 138" fill="none" stroke="#ff5d73" stroke-width="9" stroke-linecap="round"/>
+<g transform="translate(202 110)"><circle r="6" cx="0" cy="-8" fill="#ffd36e"/><circle r="6" cx="8" cy="-2" fill="#ffd36e"/><circle r="6" cx="5" cy="7" fill="#ffd36e"/><circle r="6" cx="-5" cy="7" fill="#ffd36e"/><circle r="6" cx="-8" cy="-2" fill="#ffd36e"/><circle r="4" fill="#ff5d73"/></g>
+<g class="eye"><circle cx="136" cy="170" r="7" fill="#2f1a10"/><circle cx="184" cy="170" r="7" fill="#2f1a10"/><circle cx="138.5" cy="167.5" r="2.5" fill="#fff"/><circle cx="186.5" cy="167.5" r="2.5" fill="#fff"/></g>
+<path d="M124 154q12-8 24-2M172 152q12-6 24 2" fill="none" stroke="#3a2012" stroke-width="3" stroke-linecap="round"/>
+<circle cx="122" cy="190" r="10" fill="#ff7a8a" opacity=".6"/><circle cx="198" cy="190" r="10" fill="#ff7a8a" opacity=".6"/>
+<path d="M142 197Q160 216 178 197Z" fill="#c8454f" stroke="${O}" stroke-width="3" stroke-linejoin="round"/>
+<rect x="266" y="204" width="36" height="16" rx="4" fill="${TP}" stroke="${O}" stroke-width="3" transform="rotate(${pose+8} 284 212)"/>
+<g transform="translate(224 74) rotate(${pose} 60 150) scale(.6)">${handG(k,0)}</g></svg>`}
+
+
+function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("show");clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove("show"),2200)}
+function replay(){$$(".wave").forEach(e=>{e.style.animation="none";e.offsetWidth;e.style.animation=""})}
+function speak(t){try{const u=new SpeechSynthesisUtterance(t);u.lang=L()?"hi-IN":"en-IN";speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){toast("Speech isn’t available on this device.")}}
+function setLang(l){lang=l;sv("lang",l);$$(".lang button").forEach(b=>b.classList.toggle("on",b.dataset.l==l));
+ $$("[data-hi]").forEach(e=>{if(!e.dataset.en)e.dataset.en=e.textContent;e.textContent=l=="hi"?e.dataset.hi:e.dataset.en});
+ document.documentElement.lang=l;fire("lang")}
+
+/* pages are separate files now: go() opens the Flask route stored in the sidebar button (data-href) */
+const PG=["overview","learn","translator","call","practice","progress","buddy","settings"];
+function go(n){if(!PG.includes(n))n="overview";if(n==PAGE){scrollTo(0,0);return}const b=$('.nav[data-t="'+n+'"]');if(b)location.href=b.dataset.href}
+function open(id,scroll){cur=id;today.add(id);sv("today",[...today]);try{sessionStorage.setItem("sk_cur",id)}catch(e){}fire("open");if(scroll)go("practice")}
+
+const ASLH={hello:"Flat hand at your forehead like a salute, then move it outward.",thanks:"Flat fingers touch your chin, then move forward and down.",help:"Place a thumbs-up fist on your open palm and lift both.",water:"Make a W and tap it on your chin twice.",yes:"Make a fist and nod it like a head.",no:"Tap index and middle fingers against your thumb.",friend:"Hook index fingers together, then reverse the hook.",sorry:"Circle an A-fist on your chest.",food:"Bring pinched fingertips to your mouth."};
+let sl=ld("sl","isl"),cfg=ld("cfg",{name:"Shaveta",theme:"auto",big:0,hc:0,rm:0,fl:0,sp:0}),mins=ld("mins",262),calls=ld("calls",[{w:"gx-pf4ved",d:"Yesterday",m:"12 min"},{w:"gx-k29ax1",d:"Mon",m:"8 min"},{w:"gx-m71tqe",d:"Last week",m:"21 min"}]),log=ld("log",[]);
+const hw=s=>sl==="asl"?ASLH[s.id]:s.how;
+function setSl(v){sl=v;sv("sl",v);$("#navLearn").textContent="Learn "+v.toUpperCase();
+ $$("[data-sl]").forEach(b=>b.classList.toggle("on",b.dataset.sl==v));fire("sl")}
+function applyCfg(){const r=document.documentElement;
+ if(cfg.theme=="auto")r.removeAttribute("data-theme");else r.setAttribute("data-theme",cfg.theme);
+ r.classList.toggle("hc",!!cfg.hc);r.classList.toggle("rm",!!cfg.rm);document.body.style.fontSize=cfg.big?"18px":"";
+ $("#uname").textContent=cfg.name||"Learner";$("#av").textContent=(cfg.name||"L").slice(0,2).toUpperCase();
+ fire("cfg");sv("cfg",cfg)}
+function addLog(t){log.push({t,d:"Just now"});log=log.slice(-10);sv("log",log)}
+setInterval(()=>{mins++;sv("mins",mins);fire("tick")},60000);
+
+document.addEventListener("click",e=>{const t=e.target.closest("[data-t],[data-p],[data-f],[data-l]");if(!t)return;const d=t.dataset;
+ if(d.t)go(d.t);
+ else if(d.p)open(d.p,1);
+ else if(d.f){fav.has(d.f)?fav.delete(d.f):fav.add(d.f);sv("fav",[...fav]);fire("fav");toast(fav.has(d.f)?"Saved to favorites":"Removed from favorites")}
+ else if(d.l)setLang(d.l)});
+document.addEventListener("click",e=>{const a=e.target.closest("[data-sl]");if(a)setSl(a.dataset.sl)});
+
+/* top bar search: filters the library on the Learn page, opens Learn from other pages */
+if(q)$("#q").value=q;
+$("#q").oninput=e=>{q=e.target.value.trim().toLowerCase();try{sessionStorage.setItem("sk_q",q)}catch(x){}fire("search");if(q)go("learn")};
+
+if(ld("fabx",0))$("#fabw").style.display="none";
+$("#fabx").onclick=()=>{$("#fabw").style.display="none";sv("fabx",1);toast("AI Buddy button hidden. You can still open it from the menu.")};
+
+/* speech + sign-gloss helpers (used by Live Sign Studio and Video call) */
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+const LEX={hello:["hello","hi","hey","namaste","namaskar","नमस्ते","नमस्कार"],thanks:["thanks","thank","धन्यवाद","शुक्रिया"],help:["help","assist","support","मदद","सहायता"],water:["water","पानी"],yes:["yes","yeah","okay","ok","sure","हाँ","हां","जी"],no:["no","नहीं","ना"],friend:["friend","friends","buddy","दोस्त","मित्र"],sorry:["sorry","apologies","apologize","माफ़","माफी","क्षमा"],food:["food","eat","eating","meal","lunch","dinner","breakfast","hungry","खाना","खाओ","भोजन"]};
+const WORD={};Object.entries(LEX).forEach(([id,ws])=>ws.forEach(w=>WORD[w.normalize("NFC")]=id));
+/* ISL drops articles/auxiliaries, puts negation after the verb and question words last */
+const DROP=new Set("a an the is am are was were be been being do does did to of for at in on will would shall can could may might very really just so that this there it its and or but with have has had i me my you your we our he she they है हैं हो था थी का की के को से में और".split(" "));
+const WH=new Set("what where when who why how which कौन क्या कहाँ कब क्यों कैसे".split(" ").map(w=>w.normalize("NFC")));
+function gloss(t){const ws=t.toLowerCase().normalize("NFC").replace(/n['’]t\b/g," not").replace(/thank you/g,"thank").split(/[^\p{L}\p{M}\p{N}]+/u).filter(Boolean),out=[],wh=[];let neg=0;
+ for(const w of ws){if(w=="not"||w=="never"){neg=1;continue}if(WH.has(w)){wh.push(w);continue}if(DROP.has(w))continue;out.push({w,id:WORD[w]||null})}
+ if(neg)out.push({w:"not",id:"no"});wh.forEach(w=>out.push({w,id:null}));
+ return out.filter((g,i)=>!(g.id&&i&&out[i-1].id===g.id))}
+
+/* local database + presence (shared so a logged-in user stays online while moving between pages) */
+const DBK="sk_db",esc=t=>String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function dbg(){const d=ld(DBK,null);if(d)return d;const n={users:{},conns:[],msgs:[]};[["priya_isl","Priya Sharma","Level 3"],["arjun_signs","Arjun Mehta","Level 2"],["meera_k","Meera Kapoor","Level 4"]].forEach(x=>n.users[x[0]]={u:x[0],name:x[1],lvl:x[2],demo:1});sv(DBK,n);return n}
+const dbs=d=>sv(DBK,d);let ME=sessionStorage.getItem("sk_me");
+const PK="sk_pres",pres=()=>ld(PK,{});
+const beat=()=>{if(ME){const p=pres();p[ME]=Date.now();sv(PK,p)}};
+setInterval(beat,5000);
+addEventListener("pagehide",()=>{if(ME){const p=pres();p[ME]=0;sv(PK,p)}});
+
+/* each page script calls boot() once its renderers are registered */
+function boot(){setSl(sl);applyCfg();if(lang!=="en")setLang(lang)}
+{% endraw %}
+</script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

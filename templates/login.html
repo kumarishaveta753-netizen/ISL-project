@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SanketAI – Sign in</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 22 22'%3E%3Crect width='22' height='22' fill='%23244832'/%3E%3Cpath d='M3 6v10M8 3v16M13 7v8M18 4v14' stroke='%23e9efe3' stroke-width='2' stroke-linecap='round' fill='none'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="auth-body">
+<div class="auth-toast" id="toast" role="status"></div>
+<button class="theme" id="theme" aria-label="Toggle theme">Theme</button>
+<div class="shell">
+  <aside class="side">
+    <div class="auth-brand"><div class="auth-logo"><svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="#e9efe3" stroke-width="2" stroke-linecap="round"><path d="M3 6v10M8 3v16M13 7v8M18 4v14"/></svg></div><div><b>SanketAI</b><small>EVERY HAND HAS A VOICE</small></div></div>
+    <div class="copy">
+      <h2 id="tag"></h2>
+      <div class="auth-bubble">Learn Indian Sign Language one sign at a time. Your camera video stays on your device.</div>
+      <div class="privacy">Private by design</div>
+    </div>
+    <div class="auth-stage">
+      <div class="say" id="say" role="status"></div>
+      <svg class="girl" id="girl" viewBox="14 14 272 306" preserveAspectRatio="xMidYMax meet" aria-hidden="true">
+        <g><circle class="g-ring" cx="150" cy="150" r="60"/><circle class="g-ring" cx="150" cy="150" r="60"/><circle class="g-ring" cx="150" cy="150" r="60"/></g>
+        <circle class="halo" cx="150" cy="158" r="128"/>
+        <g class="all">
+          <g class="head">
+            <path class="hair o" d="M82 150C70 74 118 42 152 42c40 0 80 32 68 108l2 56c0 14-14 14-14 14H94s-16 0-14-14z"/>
+            <rect class="skin2 o" x="134" y="200" width="32" height="66" rx="8"/>
+            <ellipse class="skin o" cx="150" cy="154" rx="60" ry="64"/>
+            <path class="hair o" d="M90 138C88 96 118 80 152 80c36 0 60 20 58 58-20-24-42-36-60-36s-40 12-60 36z"/>
+            <path class="band" d="M88 128Q150 74 212 128"/>
+            <g transform="translate(196 106)" stroke="#4a2616" stroke-width="2"><circle cx="8" cy="0" r="6" fill="#ffd23f"/><circle cx="2.5" cy="7.6" r="6" fill="#ffd23f"/><circle cx="-6.5" cy="4.7" r="6" fill="#ffd23f"/><circle cx="-6.5" cy="-4.7" r="6" fill="#ffd23f"/><circle cx="2.5" cy="-7.6" r="6" fill="#ffd23f"/><circle r="4.5" fill="#f58a1f"/></g>
+            <path class="brow" d="M110 142q14-10 28-1M162 141q14-9 28 1"/>
+            <g class="look"><g class="g-eye"><ellipse cx="124" cy="158" rx="6.5" ry="9" fill="#1c1410"/><circle cx="126" cy="154" r="2.2" fill="#fff"/></g><g class="g-eye"><ellipse cx="176" cy="158" rx="6.5" ry="9" fill="#1c1410"/><circle cx="178" cy="154" r="2.2" fill="#fff"/></g></g>
+            <circle cx="104" cy="184" r="10" fill="#f2737a" opacity=".75"/><circle cx="196" cy="184" r="10" fill="#f2737a" opacity=".75"/>
+            <g class="mouth"><path d="M134 180Q150 204 166 180Z" fill="#c8283c" stroke="#4a2616" stroke-width="4" stroke-linejoin="round"/></g>
+          </g>
+          <path class="shirt o" d="M34 320C40 272 80 248 128 242L150 266L172 242C220 248 262 272 268 320Z"/>
+          <path class="vee" d="M126 252L150 282L174 252"/>
+          <g class="arm">
+            <path d="M240 262C246 232 250 205 247 176" fill="none" stroke="#4a2616" stroke-width="38" stroke-linecap="round"/>
+            <path d="M240 262C246 232 250 205 247 176" fill="none" stroke="#dca06a" stroke-width="29" stroke-linecap="round"/>
+            <path d="M238 320C240 292 241 276 242 254" fill="none" stroke="#4a2616" stroke-width="46" stroke-linecap="round"/>
+            <path d="M238 320C240 292 241 276 242 254" fill="none" stroke="#f5a623" stroke-width="37" stroke-linecap="round"/>
+            <rect class="skin o" x="224" y="112" width="11" height="48" rx="5.5"/><rect class="skin o" x="236" y="104" width="11" height="52" rx="5.5"/><rect class="skin o" x="248" y="106" width="11" height="50" rx="5.5"/><rect class="skin o" x="260" y="118" width="10" height="42" rx="5"/>
+            <rect class="skin o" x="208" y="150" width="11" height="34" rx="5.5" transform="rotate(-40 213 180)"/>
+            <ellipse class="skin o" cx="247" cy="166" rx="24" ry="26"/>
+          </g>
+        </g>
+      </svg>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="auth-card" id="card">
+      <div id="head">
+        <div class="eyebrow" id="eb">Welcome back</div>
+        <h1 id="ttl">Hello again</h1>
+        <p class="auth-sub" id="sub">Sign in to continue today's sign.</p>
+      </div>
+      <div class="auth-tabs" id="tabs" data-t="in"><span class="auth-pill"></span><button class="on" data-t="in">Sign in</button><button data-t="up">Sign up</button></div>
+
+      <!-- Sign in -->
+      <form class="panel show" id="p-in" novalidate>
+        <div class="f"><input id="in-id" type="text" placeholder=" " autocomplete="username" autocapitalize="none" spellcheck="false"><label for="in-id">Email or User ID</label></div>
+        <div class="f"><input id="in-pass" type="password" placeholder=" " autocomplete="current-password"><label for="in-pass">Password</label></div>
+        <div class="err" id="in-err"></div>
+        <button class="auth-btn" id="in-go" type="submit">Sign in</button>
+        <div class="or">or</div>
+        <button class="auth-btn ghost" type="button" id="demo">Try the demo account</button>
+        <div class="hint">New to SanketAI? <a data-go="up">Create an account</a></div>
+      </form>
+
+      <!-- Sign up -->
+      <form class="panel" id="p-up" novalidate>
+        <div class="f"><input id="up-name" type="text" placeholder=" " autocomplete="name"><label for="up-name">Full name</label></div>
+        <div class="f"><input id="up-uid" type="text" placeholder=" " autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="20"><label for="up-uid">User ID (3–20 letters, numbers, _)</label><span class="st" id="uid-st"></span></div>
+        <div class="f"><input id="up-email" type="email" placeholder=" " autocomplete="email"><label for="up-email">Email address</label></div>
+        <div class="f"><input id="up-pass" type="password" placeholder=" " autocomplete="new-password"><label for="up-pass">Password (8+ characters)</label></div>
+        <div class="err" id="up-err"></div>
+        <button class="auth-btn" id="up-go" type="submit">Send verification code</button>
+        <div class="hint">Already learning? <a data-go="in">Sign in</a></div>
+      </form>
+
+      <!-- OTP -->
+      <div class="panel" id="p-otp">
+        <button class="back" id="back">← Edit details</button>
+        <p class="auth-sub" id="otp-sub" style="margin-bottom:6px"></p>
+        <div class="demo-code" id="demo-code"></div>
+        <div class="otp" id="otp"></div>
+        <div class="err" id="otp-err"></div>
+        <div class="resend">
+          <svg class="timer" viewBox="0 0 36 36"><circle class="bg" cx="18" cy="18" r="15"/><circle class="fg" id="tfg" cx="18" cy="18" r="15" stroke-dasharray="94.25" stroke-dashoffset="0"/></svg>
+          <span class="tm" id="tmsg"><span class="t-a" id="ta">Resend code in 0:30</span><button type="button" class="link t-b" id="rs" tabindex="-1">Resend code</button></span>
+        </div>
+        <button class="auth-btn" id="verify">Verify and create account</button>
+      </div>
+
+      <div class="vf" id="vf" aria-live="polite">
+        <svg class="vring" viewBox="0 0 120 120" aria-hidden="true">
+          <circle class="vbg" cx="60" cy="60" r="52"/>
+          <circle class="vspin" cx="60" cy="60" r="52"/>
+          <circle class="vfull" cx="60" cy="60" r="52"/>
+          <circle class="vburst" cx="60" cy="60" r="52"/>
+          <path class="vtick" d="M38 62l15 15 30-34"/>
+        </svg>
+        <div class="vtxt" id="vtxt">Verifying your code…</div>
+        <div class="vsub" id="vsub">Checking the code you entered</div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="reveal" id="reveal" role="status">
+  <div class="inner">
+    <div class="rwrap"><div class="rgirl" id="rgirl"></div><div class="rsay" id="rsay">Hii!</div></div>
+    <div class="eyebrow" id="r-eb">Good morning</div>
+    <h2 id="r-name">Hello</h2>
+    <p id="r-msg">Today we'll learn Hello. Open your hand, keep it relaxed, and I'll show you the movement.</p>
+    <button class="auth-btn" id="r-out">Sign out of demo</button>
+  </div>
+</div>
+
+<script>
+{% raw %}
+const $=s=>document.querySelector(s);
+const copy={in:["Welcome back","Hello again","Sign in with your email or user ID."],up:["Join SanketAI","Start signing","Create your account. We'll verify your email first."]};
+let mode='in',code='',pending=null,tick=null,locked=false;
+const tags={in:"Welcome back. Let's keep your hands talking.",up:"Join in. Every sign you learn opens a new conversation.",otp:"One last step, then your first sign awaits."};
+const says={in:"Hii! Welcome back",up:"Hii! Pick a user ID",otp:"Check your inbox"};
+let curTag='';
+function setTag(t){if(t===curTag)return;curTag=t;const h=$('#tag');h.innerHTML=t.split(' ').map((w,i)=>'<span class="w" style="animation-delay:'+(i*40)+'ms">'+w+'</span>').join(' ')}
+setTag(tags.in);
+const greet=()=>{const h=new Date().getHours();return h<12?'Good morning':h<18?'Good afternoon':'Good evening'};
+
+/* ---- accounts (demo only: stored in this browser, passwords are hashed, no server) ---- */
+const UID=/^[a-z0-9_]{3,20}$/i;
+const hash=(s,seed=7)=>{let h1=0xdeadbeef^seed,h2=0x41c6ce57^seed;for(let i=0,c;i<s.length;i++){c=s.charCodeAt(i);h1=Math.imul(h1^c,2654435761);h2=Math.imul(h2^c,1597334677)}h1=Math.imul(h1^(h1>>>16),2246822507)^Math.imul(h2^(h2>>>13),3266489909);h2=Math.imul(h2^(h2>>>16),2246822507)^Math.imul(h1^(h1>>>13),3266489909);return String(4294967296*(2097151&h2)+(h1>>>0))};
+let users=[];try{const u=JSON.parse(localStorage.getItem('sanketai.users')||'[]');if(Array.isArray(u))users=u}catch(e){}
+const save=()=>{try{localStorage.setItem('sanketai.users',JSON.stringify(users))}catch(e){}};
+const DEMO={name:'Shaveta',uid:'shaveta',email:'shaveta@sanketai.demo',ph:hash('demo-pass-123')};
+const all=()=>[DEMO,...users];
+const uidTaken=v=>all().some(u=>u.uid===v.toLowerCase());
+const emailTaken=v=>all().some(u=>u.email.toLowerCase()===v.toLowerCase());
+const findUser=id=>{const k=id.toLowerCase();return all().find(u=>u.uid===k||u.email.toLowerCase()===k)};
+
+/* ---- guide girl ---- */
+const girl=$('#girl');
+function talk(ms=1500){girl.classList.add('talk');clearTimeout(talk.t);talk.t=setTimeout(()=>girl.classList.remove('talk'),ms)}
+function setSay(t){const s=$('#say');s.textContent=t;s.classList.add('show');s.classList.remove('pop');void s.offsetWidth;s.classList.add('pop');talk()}
+function react(c){girl.classList.remove(c);void girl.getBoundingClientRect();girl.classList.add(c);setTimeout(()=>girl.classList.remove(c),700)}
+setTimeout(()=>setSay('Hii! 👋'),1000);
+$('#card').addEventListener('focusin',()=>girl.classList.add('look'));
+$('#card').addEventListener('focusout',()=>girl.classList.remove('look'));
+
+/* ---- helpers ---- */
+let toastT;
+function toast(msg,bad){const t=$('#toast');t.textContent=msg;t.classList.toggle('bad',!!bad);t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2800)}
+function setErr(id,msg){const e=$('#'+id);e.textContent=msg;e.classList.remove('pop');if(msg){void e.offsetWidth;e.classList.add('pop')}}
+function fail(id,msg){setErr(id,msg);react('oops');setSay("Hmm, let's fix that")}
+function busy(b,ms,fn){b.classList.add('loading');b.disabled=true;setTimeout(()=>{b.classList.remove('loading');b.disabled=false;fn()},ms)}
+const valid=e=>/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e);
+function flag(id,on){const f=$('#'+id).closest('.f');f.classList.remove('bad');if(on){void f.offsetWidth;f.classList.add('bad')}}
+document.addEventListener('input',e=>{const f=e.target.closest&&e.target.closest('.f');if(f)f.classList.remove('bad')});
+
+function go(id,dir,prep){
+  const el=$('#'+id),old=document.querySelector('.panel.show'),card=$('#card');
+  if(old===el)return;
+  const swap=()=>{
+    const h0=card.offsetHeight;
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('show','leave'));
+    if(prep)prep();
+    const hd=$('#head');hd.classList.remove('swap');void hd.offsetWidth;hd.classList.add('swap');
+    void el.offsetWidth;el.classList.add('show');
+    card.style.height='auto';const h1=card.offsetHeight;
+    card.style.height=h0+'px';void card.offsetHeight;card.style.height=h1+'px';
+    clearTimeout(card._t);card._t=setTimeout(()=>card.style.height='',280);
+  };
+  card.style.setProperty('--dx',(20*dir)+'px');
+  if(old){old.classList.add('leave');clearTimeout(go.t);go.t=setTimeout(swap,140)}else swap();
+}
+function setMode(m,dir){
+  mode=m;$('#tabs').dataset.t=m;
+  document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t===m));
+  go('p-'+m,dir||(m==='up'?1:-1),()=>{[$('#eb').textContent,$('#ttl').textContent,$('#sub').textContent]=copy[m];$('#tabs').style.display='';$('#head').style.display=''});
+  setTag(tags[m]);setSay(says[m]);
+}
+document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>{if(b.dataset.t!==mode)setMode(b.dataset.t)});
+document.querySelectorAll('[data-go]').forEach(a=>a.onclick=()=>setMode(a.dataset.go));
+
+/* user id live check */
+function updateUid(){const v=$('#up-uid').value,st=$('#uid-st');st.className='st';st.title='';if(!v)return;if(v.length<3){st.className='st bad';st.title='At least 3 characters'}else if(uidTaken(v)){st.className='st bad';st.title='Already taken'}else{st.className='st ok';st.title='Available'}}
+$('#up-uid').addEventListener('input',e=>{const x=e.target,c=x.value.toLowerCase().replace(/[^a-z0-9_]/g,'');if(c!==x.value)x.value=c;updateUid()});
+
+/* OTP inputs */
+const box=$('#otp');
+for(let i=0;i<6;i++){const w=document.createElement('div');w.className='cell';const x=document.createElement('input');x.inputMode='numeric';x.maxLength=1;x.setAttribute('aria-label','Digit '+(i+1));const d=document.createElement('span');d.className='d';d.setAttribute('aria-hidden','true');w.append(x,d);box.appendChild(w)}
+const cells=[...box.querySelectorAll('input')],digits=[...box.querySelectorAll('.d')];
+function setDigit(i,v,delay=0){
+  cells[i].value=v;digits[i].textContent=v;cells[i].classList.toggle('fill',!!v);digits[i].classList.remove('pop');
+  if(v){digits[i].style.animationDelay=delay+'ms';void digits[i].offsetWidth;digits[i].classList.add('pop')}
+}
+cells.forEach((c,i)=>{
+  c.oninput=()=>{const v=c.value.replace(/\D/g,'').slice(-1);setDigit(i,v);if(v&&i<5)cells[i+1].focus();$('#otp-err').textContent=''};
+  c.onkeydown=e=>{if(e.key==='Backspace'&&!c.value&&i>0){cells[i-1].focus();setDigit(i-1,'')}if(e.key==='Enter')$('#verify').click()};
+  c.onpaste=e=>{e.preventDefault();const t=(e.clipboardData.getData('text')||'').replace(/\D/g,'').slice(0,6);[...t].forEach((dg,k)=>setDigit(k,dg,k*25));cells[Math.min(t.length,5)].focus();$('#otp-err').textContent=''};
+});
+$('#rs').onclick=()=>{if(!locked&&$('#tmsg').classList.contains('ready')){sendCode();toast('A new code is on its way');setSay('New code sent!')}};
+
+function startTimer(){
+  let s=30;const fg=$('#tfg'),ta=$('#ta'),tm=$('#tmsg');clearInterval(tick);tm.classList.remove('ready');$('#rs').tabIndex=-1;
+  fg.style.transition='none';fg.style.strokeDashoffset=0;void fg.getBoundingClientRect();fg.style.transition='';
+  const upd=()=>{fg.style.strokeDashoffset=94.25*(1-s/30);
+    ta.textContent='Resend code in 0:'+String(s).padStart(2,'0');
+    if(s<=0){tm.classList.add('ready');$('#rs').tabIndex=0;clearInterval(tick)}};
+  upd();tick=setInterval(()=>{s--;upd()},1000);
+}
+function sendCode(){
+  code=String(Math.floor(100000+Math.random()*900000));
+  $('#demo-code').innerHTML='<b>Demo mode:</b> no real email is sent. Your code is <b>'+code+'</b>.';
+  cells.forEach((_,i)=>setDigit(i,''));$('#otp-err').textContent='';
+  startTimer();cells[0].focus();
+}
+
+/* ---- sign up ---- */
+$('#p-up').onsubmit=e=>{
+  e.preventDefault();
+  const n=$('#up-name').value.trim(),uid=$('#up-uid').value.trim().toLowerCase(),em=$('#up-email').value.trim(),pw=$('#up-pass').value;
+  const uidBad=!UID.test(uid)||uidTaken(uid),emBad=!valid(em)||emailTaken(em);
+  flag('up-name',!n);flag('up-uid',uidBad);flag('up-email',emBad);flag('up-pass',pw.length<8);
+  const msg=!n?'Enter your name.':!UID.test(uid)?'User ID needs 3–20 letters, numbers or underscores.':uidTaken(uid)?'That user ID is taken. Try another.':!valid(em)?'Enter a valid email address.':emailTaken(em)?'An account with this email already exists. Try signing in.':pw.length<8?'Password needs at least 8 characters.':'';
+  if(msg){fail('up-err',msg);return}
+  setErr('up-err','');
+  busy($('#up-go'),800,()=>{
+    pending={name:n,uid,email:em,ph:hash(pw)};
+    go('p-otp',1,()=>{$('#tabs').style.display='none';$('#eb').textContent='Check your inbox';$('#ttl').textContent='Enter your code';$('#sub').textContent='';$('#otp-sub').textContent='We sent a 6-digit code to '+em+'.'});
+    setTag(tags.otp);setSay(says.otp);toast('Verification code sent');setTimeout(sendCode,170);
+  });
+};
+$('#back').onclick=()=>{if(locked)return;clearInterval(tick);setMode('up',-1)};
+
+/* ---- OTP verify with circulation animation ---- */
+$('#verify').onclick=()=>{
+  if(locked)return;
+  const v=cells.map(c=>c.value).join('');
+  if(v.length<6){setErr('otp-err','Enter all 6 digits.');react('oops');return}
+  if(v!==code){setErr('otp-err','That code doesn\'t match. Check it and try again.');box.classList.remove('shake');void box.offsetWidth;box.classList.add('shake');react('oops');setSay("That code doesn't match");return}
+  clearInterval(tick);locked=true;
+  cells.forEach((c,i)=>setTimeout(()=>c.parentElement.classList.add('ok'),i*30));
+  setTimeout(runVerify,420);
+};
+function runVerify(){
+  const vf=$('#vf');vf.classList.remove('done');vf.classList.add('open');
+  $('#vtxt').textContent='Verifying your code…';$('#vsub').textContent='Checking the code you entered';
+  setSay('Verifying…');
+  setTimeout(()=>{vf.classList.add('done');$('#vtxt').textContent='Verified!';$('#vsub').textContent='Creating your account';setSay("Yay! You're verified");react('yay')},1600);
+  setTimeout(()=>{
+    users.push({name:pending.name,uid:pending.uid,email:pending.email,ph:pending.ph});save();
+    toast('Account created. Your user ID is @'+pending.uid);
+    enter(pending.name);
+  },3200);
+}
+function enter(name){
+  const card=$('#card');
+  card.classList.add('exit');
+  setTimeout(()=>openReveal(name),220);
+}
+
+/* ---- sign in (email or user ID) ---- */
+$('#p-in').onsubmit=e=>{
+  e.preventDefault();
+  const id=$('#in-id').value.trim(),pw=$('#in-pass').value,isMail=id.includes('@');
+  const idOk=isMail?valid(id):UID.test(id);
+  flag('in-id',!idOk);flag('in-pass',!pw);
+  if(!idOk||!pw){fail('in-err',!id?'Enter your email or user ID.':!idOk?(isMail?'Enter a valid email address.':'User IDs are 3–20 letters, numbers or underscores.'):'Enter your password.');return}
+  const u=findUser(id);
+  if(!u){flag('in-id',true);fail('in-err','No account found with that email or user ID.');return}
+  if(u.ph!==hash(pw)){flag('in-pass',true);fail('in-err','That password isn\'t right. Try again.');return}
+  setErr('in-err','');
+  busy($('#in-go'),700,()=>{toast('Signed in as @'+u.uid);setSay('Welcome back!');react('yay');enter(u.name)});
+};
+$('#demo').onclick=()=>{
+  const em=$('#in-id'),pw=$('#in-pass');em.value='shaveta@sanketai.demo';pw.value='demo-pass-123';
+  [em,pw].forEach(x=>x.dispatchEvent(new Event('input',{bubbles:true})));
+  flag('in-id',false);flag('in-pass',false);setErr('in-err','');setSay('Hii Shaveta!');react('yay');
+  setTimeout(()=>{toast('Signed in as @shaveta');enter('Shaveta')},500);
+};
+
+function openReveal(name){
+  const rv=$('#reveal'),first=name.trim().split(' ')[0]||name;
+  const cap=first.charAt(0).toUpperCase()+first.slice(1);
+  $('#r-eb').textContent=greet();
+  $('#r-name').textContent='Hello, '+cap+'.';
+  $('#rsay').textContent='Hii, '+cap+'!';
+  const c=girl.cloneNode(true);c.removeAttribute('id');c.setAttribute('preserveAspectRatio','xMidYMax slice');c.classList.remove('look','talk','oops','yay');c.classList.add('talk');
+  const rg=$('#rgirl');rg.innerHTML='';rg.appendChild(c);setTimeout(()=>c.classList.remove('talk'),2400);
+  [...rv.querySelector('.inner').children].forEach((el,i)=>el.style.setProperty('--j',i));
+  rv.classList.remove('open');void rv.offsetWidth;rv.classList.add('open');
+}
+$('#r-out').onclick=()=>{
+  $('#reveal').classList.remove('open');
+  ['#p-in','#p-up'].forEach(s=>$(s).reset());document.querySelectorAll('.f').forEach(f=>f.classList.remove('bad'));
+  $('#uid-st').className='st';
+  pending=null;locked=false;cells.forEach((_,i)=>setDigit(i,''));document.querySelectorAll('.cell').forEach(c=>c.classList.remove('ok'));
+  $('#vf').classList.remove('open','done');
+  $('#card').classList.remove('exit');setMode('in',-1);
+};
+
+document.addEventListener('click',e=>{const b=e.target.closest('.auth-btn');if(!b)return;const r=b.getBoundingClientRect(),s=Math.max(r.width,r.height)*2.2,p=document.createElement('span');p.className='rip';p.style.cssText='width:'+s+'px;height:'+s+'px;left:'+(e.clientX-r.left-s/2)+'px;top:'+(e.clientY-r.top-s/2)+'px';b.appendChild(p);setTimeout(()=>p.remove(),700)});
+const root=document.documentElement;
+$('#theme').onclick=()=>{
+  const dark=root.dataset.theme?root.dataset.theme==='dark':matchMedia('(prefers-color-scheme:dark)').matches;
+  root.dataset.theme=dark?'light':'dark';
+};
+{% endraw %}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

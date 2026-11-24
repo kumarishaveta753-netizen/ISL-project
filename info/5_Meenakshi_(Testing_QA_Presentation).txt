@@ -1,0 +1,403 @@
+Meenakshi � Testing, Quality Assurance & Presentation
+Beginner-friendly guide to your tasks in ISL Connect
+1. The big picture (read this first)
+ISL Connect is a website. A person opens it, turns on their camera, and signs in Indian Sign Language (ISL). The computer watches the hands, guesses which sign was made, and shows it as text (and maybe speaks it). The website also has a Learning page (to learn signs with videos), a Practice mode (the camera checks if you copied a sign correctly) and a Progress tracker (shows what you have learned).
+It only needs a normal camera � no gloves or special hardware.
+Careful: Important scope rule: the first version (called the MVP � Minimum Viable Product, the smallest working version) supports only about 10�20 verified signs. We do NOT claim it translates every ISL sentence. Sign languages have their own grammar and also use the face and body, not just hands.
+
+The 5 team members and what they own:
+Member
+Role
+One# ISL Connect – Beginner's Guide for Meenakshi
+
+## Role: Testing, Quality Assurance & Presentation Lead
+
+
+
+---
+
+
+
+### 1. Welcome & Simple Project Overview
+
+Welcome to ISL Connect! You hold two very important roles:
+
+1. **As QA Tester:** You test the application to find bugs, mistakes, and broken buttons before judges or users see them. Finding bugs is a huge victory for the team!
+
+2. **As Presentation Lead:** You tell the project story to judges through a high-quality slide deck, live demo script, and prepared answers.
+
+
+
+**Important Rule (Scope):**
+
+Our project focuses on **10 to 20 verified ISL signs**. Ensure slide claims and live demos match this scope exactly!
+
+
+
+**Your Job in 2 Sentences:**
+
+You systematically test all site features, log bug reports with clear fix owners, build an impressive PowerPoint presentation, and record a backup demonstration video.
+
+
+
+---
+
+
+
+### 2. Tools You Will Use & Why
+
+* **Google Sheets / Excel:** To write structured Test Cases and log Bug Reports.
+
+* **Snipping Tool / OBS Studio / Loom:** To capture screenshots and record short bug demonstration videos.
+
+* **Microsoft PowerPoint / Google Slides / Canva:** To create an attractive, professional presentation deck.
+
+* **Google Chrome / Firefox / Edge:** Different web browsers to test website compatibility.
+
+
+
+---
+
+
+
+### 3. Step-by-Step Task Guide
+
+
+
+#### Step 1: Write Test Cases
+
+Before testing the application, write a spreadsheet list of test cases detailing what should happen:
+
+
+
+| Test ID | Page / Feature | What You Do (Steps) | Expected Result | Pass / Fail |
+
+|---|---|---|---|---|
+
+| TC01 | Camera | Click "Start Camera" button | Webcam preview opens and shows user | PASS |
+
+| TC02 | Camera | Click "Deny" on permission prompt | Show user-friendly error banner | PASS |
+
+| TC03 | Communication | Show 'HELLO' sign to camera | Word 'HELLO' appears in transcript box | PASS |
+
+| TC04 | Confirmation | Low light sign attempt | Modal pop-up appears asking to confirm | PASS |
+
+| TC05 | Speech | Click "Listen" button | Computer speaks transcript aloud | PASS |
+
+
+
+#### Step 2: Perform Real-World Testing & Edge Cases
+
+Test the website under tricky real-world situations:
+
+* **Lighting:** Test in bright room light, dim room light, and backlighting.
+
+* **Distance:** Test sitting close to the camera ($0.5\text{m}$) and sitting far away ($2\text{m}$).
+
+* **User Variation:** Have different people perform the signs to see if recognition works for everyone.
+
+* **Browsers:** Test on Chrome, Firefox, and Microsoft Edge.
+
+
+
+#### Step 3: Write Clear Bug Reports
+
+When something breaks, write a clear bug report and assign it to the right person:
+
+
+
+```text
+
+=====================================================
+
+BUG REPORT ID: BUG_004
+
+Where: Practice Page
+
+Assigned To: Sweety (Frontend)
+
+Severity: High
+
+
+
+Steps to Reproduce:
+
+1. Open the Practice Page.
+
+2. Select the sign 'WATER'.
+
+3. Click 'Start Camera' and then immediately click 'Stop Camera'.
+
+
+
+Expected Result: Camera feed closes safely.
+
+Actual Result: The page freezes and video screen turns white.
+
+Screenshot: [Attached image bug_004.png]
+
+=====================================================
+
+```
+
+
+
+**Bug Owner Reference:**
+
+* AI / Sign Misclassification $\rightarrow$ **Madhu**
+
+* Backend / Server Error / Database $\rightarrow$ **Pooja**
+
+* UI Buttons / Layout / Camera Display $\rightarrow$ **Sweety**
+
+* Incorrect Text / Content Errors $\rightarrow$ **Shaveta**
+
+
+
+#### Step 4: Create the Presentation Slides (15 Slides)
+
+Build a 15-slide PowerPoint deck following this outline:
+
+1. **Title Slide:** ISL Connect – Bridging Communication with Indian Sign Language.
+
+2. **Team Slide:** Member names and roles (Pooja, Shaveta, Madhu, Sweety, Meenakshi).
+
+3. **Problem Statement:** Lack of accessible translation and learning tools for ISL users.
+
+4. **Proposed Solution:** Hardware-free web application utilizing computer vision.
+
+5. **Scope & MVP Boundaries:** Word-level translation supporting 10–20 verified signs.
+
+6. **System Architecture:** How Frontend, Flask Backend, MediaPipe AI, and SQLite work together.
+
+7. **Dataset & ML Pipeline:** Data sources, MediaPipe 21 landmark extraction, and model accuracy.
+
+8. **Communication Module:** Real-time sign recognition, speech features, and confirmation workflow.
+
+9. **Learning & Practice Modules:** Lessons, instructions, and camera practice feedback.
+
+10. **Progress Tracker:** SQLite database stats dashboard.
+
+11. **Testing Results:** Test accuracy tables across lighting, distance, and browsers.
+
+12. **Limitations:** Dynamic movement limits, background noise sensitivity, scope boundaries.
+
+13. **Future Roadmap:** Sentence-level translation, full sentence grammar integration, mobile app.
+
+14. **Conclusion & References:** Key takeaways and citation links.
+
+15. **Q&A Slide:** Thank you & Questions.
+
+
+
+#### Step 5: Record a Backup Video & Demo Script
+
+1. Write a 3-minute script for the live demonstration during presentation day.
+
+2. Record a smooth video showing all features working perfectly on screen. **Keep this video ready as a backup** in case live camera or internet connection fails in front of judges!
+
+
+
+---
+
+
+
+### 4. Who You Collaborate With & How
+
+* **With Everyone:** You test everyone's modules and assign bug reports to the right owner.
+
+* **With Pooja & Madhu:** Ask them for accurate AI model accuracy numbers and architecture diagrams to include on your presentation slides.
+
+* **With Shaveta:** Ensure all slides cite authentic ISL sources and correct project terminology.
+
+
+
+---
+
+
+
+### 5. Final Checklist Before Submission
+
+- [ ] Test Cases spreadsheet executed across all views.
+
+- [ ] All logged bugs re-tested and marked resolved.
+
+- [ ] PowerPoint presentation deck (15 slides) created and polished.
+
+- [ ] Live demo script rehearsed.
+
+- [ ] Backup demonstration screen-recording video saved on a USB drive/laptop.-line job
+Pooja Sharma
+Team Leader + Backend
+Runs the plan and builds the Flask server that connects everything.
+Shaveta
+Data Lead, Research, Content
+Finds and checks ISL data, signs, labels and learning content; writes documentation.
+Madhu
+AI/ML Model Developer
+Detects hands and trains the model that recognises signs.
+Sweety
+Frontend Developer
+Builds the pages the user sees and clicks.
+Meenakshi
+Testing, QA, Presentation
+Tests everything, reports bugs, builds slides and the live demo.
+
+2. Your role in simple words
+You are the quality checker and the storyteller. First you try to break the app (testing) so problems are found before the judges find them. Then you present the project honestly and confidently (slides, demo, judge questions).
+Example: before a restaurant opens, someone tastes every dish and checks every table. That is you. Later you also introduce the restaurant to the guests.
+Tip: Good testers are careful and honest. Finding a bug is a win for the team, not a criticism of a person.
+
+3. Words you should know
+Word
+Simple meaning
+QA (Quality Assurance)
+Making sure the product works well.
+Test case
+One written check: steps to follow and what should happen.
+Bug / Defect
+Something that does not work as expected.
+Reproduce
+Make the bug happen again by following exact steps.
+Retest
+Test again after the owner says they fixed it.
+UX (User experience)
+How easy and clear the app feels to a real user.
+Demo
+The live show of the project in front of judges.
+Limitation
+Something the project cannot do yet � state it honestly.
+
+4. Your tasks, step by step
+Task A � Plan your tests
+Write test cases before final integration. For each test record: Test ID, Feature, Steps, Expected result, Actual result, Pass/Fail, Screenshot/notes, and who must fix it.
+ID
+Feature
+Steps
+Expected
+Actual
+Pass/Fail
+Fix owner
+T01
+Camera permission
+Open communication page, click Start Camera, click Block
+Friendly message + retry option
+(fill)
+(fill)
+Sweety
+
+Task B � Functional testing (does each feature work?)
+� Homepage and navigation
+� Camera permission and preview
+� Sign recognition and sign-to-text output
+� Continuous recognition (if built)
+� Speech-to-text and text-to-speech
+� Uncertain-prediction handling; Confirm / Correct / Repeat
+� Learning videos and meanings
+� Practice Mode and Correct / Try Again / Unclear feedback
+� Progress updates and quiz results (if included)
+� Clear-transcript and stop-camera controls
+Task C � Real-world testing
+Try different lighting, backgrounds, camera distances and angles, signing speeds, people, and browsers. Where possible use signers who were not in the training data. Write down failures honestly � do not hide them.
+Task D � Bug reporting and retesting
+1. Reproduce the problem first.
+2. Write clear steps to reproduce it.
+3. Add a screenshot or short recording if appropriate and permitted.
+4. Send it to the right owner (table below).
+5. After the fix, retest and record the result.
+Type of problem
+Send to
+Model / recognition issues
+Madhu
+Backend / API issues
+Pooja
+Interface issues
+Sweety
+Wrong sign content or labels
+Shaveta
+
+A simple bug report format:
+Bug ID:        B07
+Where:         Practice page
+Steps:         1) Choose a sign  2) Click Start Practice  3) Deny camera
+Expected:      Message explaining how to allow the camera
+Actual:        Blank screen
+Owner:         Sweety
+Status:        Open / Fixed / Retested
+Task E � User experience testing
+Check whether a first-time user can: understand the app's purpose, start/stop camera and microphone, understand the recognised text, correct an uncertain prediction, find a lesson, watch a demo, complete a practice attempt, and understand their progress.
+Careful: Team members' opinions are not a substitute for real user feedback. Ask Deaf or fluent signing users and beginner learners where possible.
+
+Task F � Presentation
+Prepare the slides in this order:
+1. Title and team introduction
+2. Problem statement
+3. Motivation and objectives
+4. Proposed solution
+5. Target users and use case
+6. System architecture
+7. Technology stack
+8. Dataset and model workflow
+9. Communication features
+10. Learning and practice features
+11. Smart uncertainty handling
+12. Progress tracker
+13. Testing approach and actual results
+14. Limitations
+15. Future scope
+16. Conclusion and references
+Task G � Live demonstration
+1. Open the application.
+2. Show the communication page.
+3. Demonstrate one supported sign.
+4. Show resulting text (and speech if built).
+5. Trigger the uncertain-result workflow.
+6. Open the learning page.
+7. Play a sign demonstration.
+8. Complete a practice attempt.
+9. Show the practice feedback.
+10. Show the progress dashboard.
+Tip: Always record a backup screen video of the full demo in case the camera or internet fails in front of the judges. Rehearse several times.
+
+Task H � Prepare for judge questions
+Write short, accurate answers (with the help of the owner of each topic) for:
+� What problem does ISL Connect solve?
+� Why ISL?
+� Which signs does the MVP support?
+� Where did the dataset come from?
+� How does MediaPipe help?
+� Which model was trained and why?
+� How was the model evaluated?
+� What happens when the model is uncertain?
+� How does Practice Mode work?
+� What does the progress tracker store?
+� What are the current limitations?
+� How is user camera data handled?
+� What will be added in future?
+5. Your deliverables checklist
+� Test plan and test cases
+� Bug/issue log
+� Retest results
+� User feedback summary (if collected)
+� Final PowerPoint presentation
+� Live demo script and backup demo
+� Judge Q&A document
+� Quality assurance summary
+6. Who you work with
+Person
+How you work together
+Everyone
+You test all modules and report defects to the right owner, then retest.
+Shaveta
+She gives you accurate project facts, sources and limitations.
+All owners
+You check that slide claims match what is really built and tested.
+
+7. Common beginner mistakes to avoid
+� Reporting a bug without steps to reproduce it.
+� Testing only with team members who trained the model.
+� Putting features on slides that are not built or not tested.
+� Claiming accuracy or speed numbers you did not measure.
+� Not preparing a backup demo video.
+ISL Connect � Meenakshi � Testing, Quality Assurance & Presentation  |  Page 1
+

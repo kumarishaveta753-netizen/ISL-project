@@ -1,0 +1,295 @@
+# ISL Connect – Beginner's Guide for Madhu
+
+## Role: AI/ML Model Developer
+
+
+
+---
+
+
+
+### 1. Welcome & Simple Project Overview
+
+Welcome to ISL Connect! You are building the "brain" of the application. When a user holds their hand up in front of the camera, your code finds the hand, converts the finger joints into numerical coordinates, and uses a trained machine learning model to guess which sign is being performed.
+
+
+
+**Important Rule (Scope):**
+
+Our first version (MVP) recognizes **10 to 20 signs** only. Build a simple, honest model first!
+
+
+
+**Your Job in 2 Sentences:**
+
+You use OpenCV and Google MediaPipe to extract 21 landmark points from hand images, train a classification model (using scikit-learn or TensorFlow) to recognize those coordinates, and save your trained model so Pooja can use it in the backend.
+
+
+
+---
+
+
+
+### 2. Tools You Will Use & Why
+
+* **Python (3.10+):** The primary language for AI and machine learning tasks.
+
+* **OpenCV (`cv2`):** Python library that opens video frames from the webcam and reads image files.
+
+* **MediaPipe Hands:** A free Google tool that automatically locates hand joints and returns 21 $(x, y, z)$ numerical coordinates per hand.
+
+* **Scikit-Learn / TensorFlow:** Machine learning frameworks used to train your prediction classifier model.
+
+* **Jupyter Notebook / VS Code:** Interactive environments to write, test, and view your AI training code.
+
+
+
+---
+
+
+
+### 3. Step-by-Step Task Guide
+
+
+
+#### Step 1: Install Required AI Libraries
+
+Open your terminal inside your Python virtual environment and run:
+
+```bash
+
+pip install opencv-python mediapipe numpy scikit-learn joblib
+
+```
+
+
+
+#### Step 2: Understand Hand Landmarks (MediaPipe)
+
+MediaPipe detects **21 key points** on a hand (0 is the wrist, 4 is the thumb tip, 8 is the index fingertip, etc.). Each point has $x, y, z$ values.
+
+* 21 points $\times 3$ coordinates $(x,y,z) = 63$ numbers per hand.
+
+
+
+Test MediaPipe with this starter script:
+
+```python
+
+import cv2
+
+import mediapipe as mp
+
+
+
+mp_hands = mp.solutions.hands
+
+hands = mp_hands.Hands(static_image_mode=True, max_num_hands=1)
+
+
+
+# Read an image
+
+image = cv2.imread('sample_hand.jpg')
+
+rgb_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
+results = hands.process(rgb_image)
+
+
+
+if results.multi_hand_landmarks:
+
+    for hand_landmarks in results.multi_hand_landmarks:
+
+        for lm in hand_landmarks.landmark:
+
+            print(f"X: {lm.x}, Y: {lm.y}, Z: {lm.z}")
+
+else:
+
+    print("No hand found in picture!")
+
+```
+
+
+
+#### Step 3: Turn Shaveta's Dataset into Numbers (Preprocessing)
+
+Loop through Shaveta's dataset folders, extract the 63 numbers for every image, and normalize them so hand distance from the camera doesn't confuse the model:
+
+
+
+```python
+
+import os
+
+import numpy as np
+
+
+
+def extract_normalized_landmarks(hand_landmarks):
+
+    points = []
+
+    wrist_x = hand_landmarks.landmark[0].x
+
+    wrist_y = hand_landmarks.landmark[0].y
+
+    wrist_z = hand_landmarks.landmark[0].z
+
+
+
+    for lm in hand_landmarks.landmark:
+
+        # Subtract wrist coordinate so hand position starts at (0,0,0)
+
+        points.extend([lm.x - wrist_x, lm.y - wrist_y, lm.z - wrist_z])
+
+    return points
+
+```
+
+
+
+Save all extracted landmarks into an array `X` and sign names into `y`.
+
+
+
+#### Step 4: Train the Classifier Model
+
+Train a simple Random Forest classifier on your extracted landmark data:
+
+
+
+```python
+
+from sklearn.model_selection import train_test_split
+
+from sklearn.ensemble import RandomForestClassifier
+
+from sklearn.metrics import accuracy_score
+
+import joblib
+
+
+
+# Split into Training and Testing groups
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+
+
+# Train the model
+
+model = RandomForestClassifier(n_estimators=100)
+
+model.fit(X_train, y_train)
+
+
+
+# Test model accuracy
+
+predictions = model.predict(X_test)
+
+print("Model Accuracy:", accuracy_score(y_test, predictions))
+
+
+
+# Save the trained model to a file for Pooja
+
+joblib.dump(model, 'isl_model.pkl')
+
+print("Model saved as isl_model.pkl!")
+
+```
+
+
+
+#### Step 5: Write the Prediction Function for Pooja
+
+Create a file named `predictor.py` that Pooja can easily call inside Flask:
+
+
+
+```python
+
+import joblib
+
+import numpy as np
+
+
+
+model = joblib.load('isl_model.pkl')
+
+
+
+def predict_hand_sign(landmark_list):
+
+    if not landmark_list or len(landmark_list) == 0:
+
+        return {"status": "no_hand", "label": None, "confidence": 0.0}
+
+
+
+    # Convert list to array
+
+    data = np.array(landmark_list).reshape(1, -1)
+
+    
+
+    # Get probabilities
+
+    probabilities = model.predict_proba(data)[0]
+
+    max_idx = np.argmax(probabilities)
+
+    confidence = float(probabilities[max_idx])
+
+    label = model.classes_[max_idx]
+
+
+
+    # Confidence Threshold Rule
+
+    if confidence >= 0.70:
+
+        return {"status": "recognized", "label": label, "confidence": round(confidence, 2)}
+
+    else:
+
+        return {"status": "uncertain", "label": label, "confidence": round(confidence, 2)}
+
+```
+
+
+
+---
+
+
+
+### 4. Who You Collaborate With & How
+
+* **With Shaveta (Data Lead):** Receive the dataset folders from her. Tell her immediately if some images are blurry or corrupt.
+
+* **With Pooja (Backend):** Hand over your `isl_model.pkl` file and `predictor.py` script. Explain what input format your predictor expects.
+
+* **With Sweety (Frontend):** Ensure she knows what `"status"` outputs exist (`recognized`, `uncertain`, `no_hand`) so she can display pop-ups when confidence is low.
+
+* **With Meenakshi (QA):** When she tests the app in different room lighting and reports recognition errors, work with her to tune thresholds or re-train with broader samples.
+
+
+
+---
+
+
+
+### 5. Final Checklist Before Submission
+
+- [ ] Landmark extraction script runs without errors.
+
+- [ ] Model trained on 10–20 signs with high accuracy score logged.
+
+- [ ] Trained model saved as `isl_model.pkl`.
+
+- [ ] `predictor.py` script tested and delivered to Pooja.

@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block content %}
+<section id="overview" class="on">
+ <div class="hero">
+  <div>
+   <p class="eb" id="greet">Good morning</p>
+   <h1><span data-hi="नमस्ते, श्वेता">Hello, Shaveta</span></h1>
+   <div class="bubble" id="bub"></div>
+   <div class="row"><button class="btn" id="startToday" data-hi="आज का साइन शुरू करें">Start today’s sign</button><button class="btn o" id="goLearn" data-hi="सभी साइन देखें">Browse all signs</button></div>
+  </div>
+  <div class="mira" id="miraHero"></div>
+ </div>
+ <div class="g2">
+  <div class="card">
+   <p class="eb" data-hi="आपकी यात्रा">Your journey</p>
+   <div class="row" style="justify-content:space-between"><h2 style="font-size:30px" data-hi="जहाँ छोड़ा था वहीं से">Pick up where you left off</h2></div>
+   <div id="lessons" style="margin-top:14px"></div>
+  </div>
+  <div class="card">
+   <p class="eb" data-hi="आज का साइन">Sign of the day</p>
+   <h2 style="font-size:34px" id="sodName">Hello</h2>
+   <div class="sod hand" id="sodHand"></div>
+   <p id="sodHow" style="color:var(--mute);margin:0 0 14px;font-size:13px"></p>
+   <button class="btn o" style="width:100%" id="sodBtn" data-hi="▷ इस साइन का अभ्यास करें">▷ Practice this sign</button>
+  </div>
+ </div>
+ <div class="lg2" id="lgc">
+  <button class="card lgc on" data-sl="isl"><p class="eb">Indian Sign Language</p><h3>Learn ISL</h3><p>Everyday signs used across India.</p></button>
+  <button class="card lgc" data-sl="asl"><p class="eb">American Sign Language</p><h3>Learn ASL</h3><p>Connect with the wider Deaf community.</p></button>
+ </div>
+ <div class="stats">
+  <div class="card stat"><b id="sLearned">24</b><span data-hi="सीखे गए साइन">Signs learned</span><small id="sWeek">+6 this week</small></div>
+  <div class="card stat"><b>6</b><span data-hi="दिन की लगातार प्रैक्टिस">Day streak</span><small>Personal best</small><div class="dots" id="dots"></div></div>
+  <div class="card stat"><b id="sAcc">82%</b><span data-hi="अभ्यास की सटीकता">Practice accuracy</span><small>+8% improvement</small></div>
+  <div class="card stat"><svg class="ring" viewBox="0 0 100 100" id="ring"></svg><b id="sGoal">0/5</b><span data-hi="आज का लक्ष्य">Today’s goal</span><small>Practice 5 signs</small></div>
+ </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+{% raw %}
+/* Overview page */
+const miraHero=()=>$("#miraHero").innerHTML=mira("hello");
+function renderLessons(){$("#lessons").innerHTML=LESS.map((l,i)=>`<div class="lesson"><div class="num ${l[4]}">0${i+1}</div><div><p class="eb" style="margin:0;font-size:10px">${l[0]}</p><h3>${l[1]}</h3></div><div class="bw"><div class="bar"><i style="width:${l[2]/l[3]*100}%"></i></div><small style="color:var(--mute)">${l[2]} of ${l[3]} signs</small></div><button class="arrow" data-go="${i}" aria-label="Open ${l[1]}">→</button></div>`).join("")}
+function renderSod(){const s=sg("hello");$("#sodName").textContent=nm(s);$("#sodHand").innerHTML=HS(s.id);$("#sodHow").textContent=s.how}
+function renderStats(){setTimeout(renderExtra,0);const n=24+done.size;$("#sLearned").textContent=n;$("#sWeek").textContent="+"+(6+done.size)+" this week";
+ const acc=Math.round((820+qa.c*100)/(10+qa.t));$("#sAcc").textContent=acc+"%";
+ const g=Math.min(today.size,5),C=2*Math.PI*38;
+ $("#ring").innerHTML=`<circle cx="50" cy="50" r="38" fill="none" stroke="var(--chip)" stroke-width="10"/><circle cx="50" cy="50" r="38" fill="none" stroke="var(--moss)" stroke-width="10" stroke-linecap="round" stroke-dasharray="${C*g/5} ${C}" transform="rotate(-90 50 50)"/><text x="50" y="57">${g}</text>`;
+ $("#sGoal").textContent=g+"/5";
+ $("#dots").innerHTML="MTWTFS".split("").concat("S").map((d,i)=>`<i class="${i<6?"d":""}">${d}</i>`).join("");}
+function renderLgc(n){const D=[["isl","Indian Sign Language","Learn ISL",n],["asl","American Sign Language","Learn ASL",6]];
+ $("#lgc").innerHTML=D.map(d=>`<button class="card lgc ${sl==d[0]?"on":""}" data-sl="${d[0]}"><p class="eb">${d[1]}</p><h3>${d[2]}</h3><div class="bar" style="margin:10px 0 6px"><i style="width:${d[3]/40*100}%"></i></div><p>${d[3]} of 40 signs · ${Math.round(d[3]/40*100)}%</p><p style="margin-top:8px;color:var(--forest);font-weight:700">${sl==d[0]?"Continue":"Switch & continue"} →</p></button>`).join("")}
+function renderExtra(){renderLgc(24+done.size)}
+$("#startToday").onclick=$("#sodBtn").onclick=()=>open("hello",1);
+$("#goLearn").onclick=()=>go("learn");
+$("#lgc").addEventListener("click",e=>{if(e.target.closest("[data-sl]"))go("learn")});
+document.addEventListener("click",e=>{const t=e.target.closest("[data-go]");if(t)open(S[+t.dataset.go*2].id,1)});
+const h=new Date().getHours();$("#greet").textContent=h<12?"Good morning":h<17?"Good afternoon":"Good evening";
+$("#bub").innerHTML="Today we’ll learn <b>Hello</b>. Open your hand, keep it relaxed, and I’ll show you the movement.";
+HOOK.lang.push(renderSod);HOOK.sl.push(renderExtra);HOOK.fav.push(renderExtra);
+miraHero();renderLessons();renderSod();renderStats();
+boot();
+{% endraw %}
+</script>
+{% endblock %}

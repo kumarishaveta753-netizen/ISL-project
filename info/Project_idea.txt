@@ -1,0 +1,239 @@
+ISL CONNECT — INITIAL PROJECT MENTOR REVIEW Honest assessment, risks,
+and recommended direction Prepared: 10 November 2026
+
+1.  MY UNDERSTANDING OF YOUR PROJECT
+
+Project name: ISL Connect Project description: An Indian Sign Language
+(ISL) communication and learning platform.
+
+The project has two main purposes:
+
+A. Communication - Convert selected Indian Sign Language gestures into
+text and, where appropriate, speech. - Convert spoken language into text
+captions. - Support communication between Deaf and hearing people.
+
+B. Learning - Help beginners learn ISL through demonstration videos. -
+Let learners practise signs in front of a camera. - Give feedback after
+practice. - Provide English and Hindi meanings. - Include simple quizzes
+and progress tracking.
+
+Your proposed technology stack: - Python - Flask - MediaPipe - OpenCV -
+HTML, CSS and JavaScript - Machine Learning / Deep Learning
+
+Other planned features: - Continuous sentence recognition. - Smart sign
+correction when recognition is uncertain. - Camera-condition guidance. -
+A confirmation prompt when the AI is unsure. - Learning and practice
+mode. - Progress tracking.
+
+The intended approach is camera-based, without a special glove or other
+hardware.
+
+2.  INITIAL HONEST REVIEW
+
+The idea has potential, but the current scope is too ambitious for a
+two-month student project if every feature is expected to work reliably.
+
+The project currently combines two substantial products: 1. A
+sign-language communication and recognition system. 2. An interactive
+sign-language learning platform.
+
+The risk is that the team may build two incomplete systems instead of
+one convincing working system.
+
+Recommendation: Make communication the primary product and learning the
+secondary product. Both should use the same sign-recognition engine
+wherever possible, rather than becoming two unrelated applications.
+
+Preliminary assessment: - Problem selection: Strong. - Social impact:
+Strong. - Innovation potential: Good, but depends on execution. -
+Technical complexity: High. - Two-month feasibility: Scope must be
+reduced. - Differentiation: Not yet clearly established. - Demonstration
+potential: Good if the core recognition works reliably.
+
+3.  FIVE IMPORTANT AREAS TO RECONSIDER
+
+AREA 1 — WHAT EXACTLY WILL THE AI RECOGNIZE?
+
+MediaPipe can detect and extract hand landmarks. However, extracting
+landmarks is not the same as understanding sign language.
+
+There are different levels of difficulty:
+
+-   Static signs: A hand holds a particular shape or position.
+-   Dynamic signs: A sign involves movement over a sequence of frames.
+-   Real communication: Meaning may depend on hand movements, facial
+    expressions, body posture, timing and context.
+
+If the model recognizes only hand shapes, the team must not claim that
+it translates complete ISL conversations.
+
+Recommendation: Start with a limited, clearly defined ISL vocabulary.
+Make recognition of that vocabulary reliable before expanding it. State
+exactly what the system can and cannot recognize.
+
+AREA 2 — CONTINUOUS SENTENCE RECOGNITION
+
+This feature sounds impressive, but it is technically challenging.
+
+For example, a short sequence might be: I → WANT → WATER
+
+The application must: - Recognize each sign. - Determine when one sign
+ends and the next begins. - Preserve the correct order. - Handle pauses
+between signs. - Convert the recognized sequence into readable output.
+
+Recognizing three isolated gestures does not automatically mean the
+system understands a sentence.
+
+Recommendation: Build a sequence-recognition pipeline and first
+demonstrate a small set of predefined phrases or sequences. Do not claim
+unrestricted, real-time sentence translation unless it has actually been
+implemented and tested.
+
+AREA 3 — SMART SIGN CORRECTION AND UNCERTAINTY
+
+The system should not confidently display a result when it is unsure.
+
+For example, a model might produce these scores: - HELLO: 48% - THANK
+YOU: 43% - UNKNOWN: 9%
+
+These scores indicate uncertainty; they should not be presented as
+guaranteed probabilities of correctness.
+
+A sensible interaction could be: - High-confidence result: show the
+predicted sign. - Ambiguous result: ask the user to confirm or repeat. -
+Poor camera input: explain how to improve the camera position or
+lighting. - Unknown sign: say that the sign is not currently supported.
+
+Recommendation: Implement a confidence threshold and an
+uncertainty-handling mechanism. Test the thresholds on validation data.
+Do not simply show “Try Again” for every problem; explain what the user
+should do next.
+
+AREA 4 — MAKE THE LEARNING PLATFORM INTERACTIVE
+
+A learning page that only contains a collection of videos is not enough
+to make the project distinctive.
+
+A stronger learning cycle is:
+
+1.  LEARN The learner watches a demonstration of an ISL sign.
+
+2.  PRACTISE The learner performs the sign in front of the camera.
+
+3.  EVALUATE The system compares the learner’s performance with the
+    expected class or reference pattern and provides feedback.
+
+4.  TRACK PROGRESS The platform records signs practised, signs
+    completed, and signs still to learn.
+
+Important limitation: Do not tell a learner that their sign is
+definitely correct just because the model predicts the expected class.
+Recognition reliability must be evaluated first. If the model is
+uncertain, the feedback should say so.
+
+AREA 5 — DATASET STRATEGY
+
+This is one of the most important project decisions. The team needs a
+clear answer to: Where will the ISL training and testing data come from?
+
+Decide: - Which signs will be included in the first version? - Will you
+use an existing dataset, collect your own data, or combine both? - Who
+will perform and record the signs? - How many examples will be collected
+for each sign? - How will you include different people, lighting
+conditions, camera angles and signing speeds? - How will you test the
+model on people whose recordings were not used for training?
+
+Do not randomly split video frames from the same recording into training
+and testing sets. That can make performance appear better than it really
+is. Where possible, separate data by signer or recording session so the
+test better reflects use with new people.
+
+A weak dataset can make even a well-written application fail. Dataset
+planning is not a minor detail; it can determine whether the project
+succeeds.
+
+4.  HOW I RECOMMEND YOU POSITION THE PROJECT
+
+A practical direction for a two-month project:
+
+PRIMARY MODULE — COMMUNICATION - Camera input. - Hand landmark
+extraction. - Recognition of a limited ISL vocabulary. - Display
+recognized output as text. - Optional text-to-speech for recognized
+output. - Speech-to-text captions for the hearing person’s response. -
+Uncertainty prompts and camera guidance.
+
+SECONDARY MODULE — LEARNING - A curated set of beginner ISL signs. -
+Short demonstration videos. - Camera-based practice. - Feedback that
+reflects model confidence and limitations. - English and Hindi
+meanings. - Basic quizzes. - Progress tracking.
+
+SHARED CORE Both modules should reuse the same recognition model and
+sign definitions wherever possible. This reduces duplicated work and
+makes the project easier to maintain.
+
+5.  HOW I WILL EVALUATE THE PROJECT AS YOUR MENTOR
+
+I will review the project across these areas:
+
+-   Problem: Are you solving a real and clearly defined problem?
+-   Innovation: What makes the solution meaningfully different from
+    existing tools?
+-   Technical quality: Is the AI actually doing what the project claims?
+-   Feasibility: Can a five-member team build it within two months?
+-   Accuracy: Has the system been tested on suitable data?
+-   User experience: Can a real user understand and operate it?
+-   Presentation: Can the team explain and defend every technical
+    decision?
+
+I will distinguish between: - FACT: What is technically established. -
+ASSUMPTION: What has not yet been verified. - RECOMMENDATION: What I
+think the team should do. - RISK: What could make the implementation
+fail.
+
+I will not recommend adding features merely to make the project
+description sound impressive. Each feature must have a clear purpose and
+a working implementation.
+
+6.  THE FIRST QUESTION: WHAT IS YOUR CURRENT PROGRESS?
+
+Before creating a detailed roadmap, establish the team’s actual
+position.
+
+Choose the closest stage:
+
+A. Planning only: The team has an idea and a list of features, but has
+not started building.
+
+B. Research: The team is researching ISL, datasets, recognition methods
+and technologies.
+
+C. Development: The team has started frontend or backend development.
+
+D. Model development: The team is working on the AI/ML recognition
+model.
+
+E. Prototype: The team already has a working prototype.
+
+Also record: - What has already been completed? - What is currently
+being built? - What is blocked? - Who is responsible for each part? -
+What is the final submission or demonstration deadline?
+
+The roadmap should be based on the real progress, not assumptions.
+
+7.  FINAL MENTOR’S NOTE
+
+The goal is not to build a project that merely looks impressive in a
+presentation. The goal is to build something that still makes sense when
+a technical judge asks how it works.
+
+Be precise about the vocabulary supported, the data used, the model’s
+limitations, the measured accuracy and the conditions under which the
+application works.
+
+A smaller system that works reliably and is honestly demonstrated is
+stronger than a large collection of features that only work in a
+prepared demonstration.
+
+The next step is to establish the team’s current stage and dataset plan.
+Only then should the detailed two-month implementation roadmap be
+finalized.

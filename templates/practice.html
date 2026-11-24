@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block content %}
+<section id="practice" class="on">
+ <p class="eb" id="focus">Focused review</p>
+ <h2 class="big" data-hi="मीरा के साथ अभ्यास">Practice with Mira</h2>
+ <p class="sub">Watch the movement, try it at your own pace, then compare using your camera.</p>
+ <div class="pgrid">
+  <div>
+   <div class="card" style="padding:16px;margin-bottom:20px">
+    <div class="cam" id="cam2"><div id="camMsg2"><h3>Show the sign to your camera</h3><p style="opacity:.75;font-size:13px">Copy the little teacher in the corner. Your video stays on your device.</p></div>
+     <div class="coach" id="coach"><div class="mira" id="tMira"></div><div class="hand" id="tHand"></div><span id="tName"></span></div></div>
+    <div class="row" style="margin-top:14px;justify-content:space-between;flex-wrap:nowrap"><span id="tHint" style="color:var(--mute)"></span><button class="btn" id="camBtn2">Start camera</button></div>
+   </div>
+   <div class="card" style="padding:0">
+    <div class="stage" id="stage">
+     <div class="pane sage"><div class="hand" id="bigHand"></div><span class="ml">Follow the hand movement</span></div>
+     <div class="pane peach"><div class="mira" id="miraBig"></div><span class="ml" style="left:auto;right:18px">Mira demonstrates</span></div>
+    </div>
+    <div style="padding:26px">
+     <p class="eb" data-hi="आपका अगला साइन">Your next sign</p>
+     <div class="row" style="justify-content:space-between;gap:20px"><h2 style="font-size:42px" id="cName">Hello</h2><p id="cHow" style="color:var(--mute);flex:1;min-width:200px;margin:0"></p></div>
+     <div class="row" style="margin-top:16px">
+      <button class="btn o" id="spk">🔊 Hear it</button>
+      <button class="btn o" id="slow">🐢 Slow motion</button>
+      <button class="btn o" id="lab">☝ Show fingers</button>
+      <button class="btn o" id="favBtn" data-f="hello">☆ Save sign</button>
+      <button class="btn" id="done">✓ Mark as learned</button>
+     </div>
+     <div class="legend">Fingers: <b>T</b> thumb · <b>1</b> index · <b>2</b> middle · <b>3</b> ring · <b>4</b> pinky</div>
+     <div class="pick" id="pick"></div>
+    </div>
+   </div>
+  </div>
+  <div style="display:grid;gap:20px;align-content:start">
+   <div class="tip"><p class="eb" style="color:#e9b46a">Mira’s tip</p><h3>Keep your movement clear and relaxed.</h3><p>Face the camera, keep both shoulders visible, and leave space around your hands.</p></div>
+   <div class="card"><h3 style="font-size:26px">Practice rhythm</h3><ul class="steps" id="steps"></ul></div>
+   <div class="card quiz"><p class="eb">Quick check</p><b>Which sign is this?</b><div class="hand sage" id="qHand" style="width:110px;margin:10px 0;padding:6px"></div><div class="opts" id="opts"></div></div>
+   <div class="card"><p class="eb">Today</p><h3 style="font-size:26px">Today’s practice</h3><div class="bar" style="margin:12px 0 6px"><i id="tdBar"></i></div><small id="tdTxt" style="color:var(--mute)"></small></div>
+   <div class="card"><p class="eb">Up next</p><h3 style="font-size:26px">Keep going</h3><div id="nextL"></div></div>
+  </div>
+ </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+{% raw %}
+/* Practice with Mira page */
+function renderPractice(){const s=sg(cur),i=S.indexOf(s);
+ $("#focus").textContent=`Focused review · ${i+1} of ${S.length}`;
+ $("#bigHand").innerHTML=HS(cur);$("#miraBig").innerHTML=mira(cur);$("#tMira").innerHTML=mira(cur);$("#tHand").innerHTML=HS(cur);$("#tName").textContent="Mira teaches: "+nm(s);$("#tHint").textContent="Now signing: "+nm(s)+" – "+hw(s);
+ $("#cName").textContent=nm(s);$("#cHow").textContent=hw(s);
+ $("#tdBar").style.width=Math.min(100,today.size/5*100)+"%";$("#tdTxt").textContent=today.size+" of 5 signs practiced today · "+done.size+" marked as learned";
+ $("#nextL").innerHTML=[1,2,3].map(k=>S[(i+k)%S.length]).map(x=>`<div class="li"><div class="row" style="flex-wrap:nowrap"><div class="mini hand">${HS(x.id)}</div><b>${nm(x)}</b></div><button class="lk" data-p="${x.id}">Practice →</button></div>`).join("");updFav();
+ $("#pick").innerHTML=S.map((x,j)=>`<button class="${x.id==cur?"on":""} ${done.has(x.id)?"dn":""}" data-p="${x.id}"><b style="font-family:'Playfair Display',serif;color:var(--gold);margin-right:6px">0${j+1}</b>${nm(x)}</button>`).join("");
+ $("#done").textContent=done.has(cur)?"✓ Learned":"✓ Mark as learned";
+ const st=["Watch Mira","Shape your hand","Move with intention","Try with camera"];
+ $("#steps").innerHTML=st.map((t,j)=>`<li><button class="${j==step?"on":""}" data-s="${j}"><b>${j+1}</b>${t}</button></li>`).join("");
+ newQuiz()}
+function newQuiz(){const c=S[Math.floor(Math.random()*S.length)],o=[c,...S.filter(x=>x!=c).sort(()=>Math.random()-.5).slice(0,2)].sort(()=>Math.random()-.5);
+ ans=c.id;$("#qHand").innerHTML=HS(c.id);$("#opts").innerHTML=o.map(x=>`<button data-a="${x.id}">${nm(x)}</button>`).join("")}
+function updFav(){const b=$("#favBtn");b.dataset.f=cur;b.textContent=fav.has(cur)?"★ Saved":"☆ Save sign"}
+document.addEventListener("click",e=>{const t=e.target.closest("[data-s],[data-a]");if(!t)return;const d=t.dataset;
+ if(d.s!==undefined){step=+d.s;renderPractice();if(step==0)replay();if(step==1){$("#stage").classList.add("labels");$("#lab").textContent="☝ Hide fingers"}if(step==2){$("#stage").classList.add("slow");replay()}if(step==3&&!st2)$("#camBtn2").click()}
+ else if(d.a){const ok=d.a==ans;qa.t++;if(ok)qa.c++;sv("qa",qa);t.classList.add(ok?"ok":"no");toast(ok?"Correct, well done!":"Not quite. That was "+nm(sg(ans))+".");setTimeout(newQuiz,1100)}});
+$("#spk").onclick=()=>speak(nm(sg(cur))+". "+sg(cur).how);
+$("#slow").onclick=()=>{$("#stage").classList.toggle("slow");replay()};
+$("#lab").onclick=()=>{const on=$("#stage").classList.toggle("labels");$("#lab").textContent=on?"☝ Hide fingers":"☝ Show fingers"};
+$("#done").onclick=()=>{done.has(cur)?done.delete(cur):(done.add(cur),toast("Marked as learned: "+nm(sg(cur))));sv("done",[...done]);renderPractice()};
+let st2=null;$("#camBtn2").onclick=async()=>{const b=$("#camBtn2");if(st2){st2.getTracks().forEach(t=>t.stop());st2=null;$("#cam2 video")?.remove();$("#camMsg2").style.display="";b.textContent="Start camera";return}
+ try{st2=await navigator.mediaDevices.getUserMedia({video:true});const v=document.createElement("video");v.autoplay=v.muted=v.playsInline=true;v.srcObject=st2;$("#cam2").prepend(v);$("#camMsg2").style.display="none";b.textContent="Stop camera"}catch(e){toast("Camera is blocked. Allow access in your browser settings, then try again.")}};
+HOOK.lang.push(renderPractice);HOOK.sl.push(renderPractice);HOOK.open.push(()=>{step=0;renderPractice()});HOOK.fav.push(updFav);
+HOOK.cfg.push(()=>$("#stage").classList.toggle("labels",!!cfg.fl));
+renderPractice();
+boot();
+{% endraw %}
+</script>
+{% endblock %}

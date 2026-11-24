@@ -1,0 +1,175 @@
+# ISL Connect – Beginner's Guide for Shaveta
+
+## Role: Data Lead, Research, Content & Team Management
+
+
+
+---
+
+
+
+### 1. Welcome & Simple Project Overview
+
+Welcome to ISL Connect! Our project helps people communicate using Indian Sign Language (ISL), learn signs through short lessons, and practice them using an ordinary computer camera.
+
+
+
+**Important Rule (Scope):**
+
+Our first version (MVP) focuses on **10 to 20 verified ISL signs** only. We are not doing full sentence translation.
+
+
+
+**Your Job in 2 Sentences:**
+
+You are the content expert and truth-keeper of the team. You research authentic ISL signs, find and organize high-quality datasets for Madhu's AI model, write easy-to-understand learning guides for Sweety's UI, and help Pooja keep track of daily team tasks.
+
+
+
+---
+
+
+
+### 2. Tools You Will Use & Why
+
+* **Google Sheets / Microsoft Excel:** To create organized tables listing our 10-20 signs, source links, and lesson text.
+
+* **Kaggle / Roboflow Universe:** Websites where you can search for and download free open-source sign language image/video datasets.
+
+* **Google Drive / Dropbox:** To store raw dataset folders, video clips, and document files securely.
+
+* **Trello / Google Sheets:** To manage daily team checklists alongside Pooja.
+
+
+
+---
+
+
+
+### 3. Step-by-Step Task Guide
+
+
+
+#### Step 1: Select & Verify the 10-20 ISL Signs
+
+1. Pick 10 to 20 signs from simple daily categories:
+
+   * **Greetings:** Hello, Thank You, Welcome
+
+   * **Emergency/Help:** Help, Doctor, Water, Food
+
+   * **Simple Responses:** Yes, No, Please
+
+   * **Numbers:** 1, 2, 3, 4, 5
+
+2. Verify that these signs are **genuine Indian Sign Language (ISL)** and NOT American Sign Language (ASL).
+
+3. Create a master Google Sheet named `ISL_Master_Signs`:
+
+   * Column A: Sign Name (e.g., `HELLO`)
+
+   * Column B: Hands Used (1 Hand or 2 Hands)
+
+   * Column C: Is there movement? (Yes/No)
+
+   * Column D: Source Link (Where you verified it)
+
+   * Column E: Status (Verified ISL)
+
+
+
+#### Step 2: Find & Download Datasets for Madhu
+
+1. Go to Kaggle.com or Universe.roboflow.com and search for *"Indian Sign Language Dataset"*.
+
+2. Check the license: Make sure it is free to use for academic/project purposes.
+
+3. Check the images: Ensure the pictures are clear, well-lit, and correctly labeled.
+
+4. Download the folder and organize it on Google Drive like this:
+
+   ```text
+
+   ISL_Dataset/
+
+   ├── HELLO/
+
+   │   ├── img1.jpg
+
+   │   └── img2.jpg
+
+   ├── THANK_YOU/
+
+   │   ├── img1.jpg
+
+   │   └── img2.jpg
+
+   └── WATER/
+
+   ```
+
+5. Share the folder link with **Madhu**.
+
+
+
+#### Step 3: Write Learning Page Content for Sweety
+
+For every sign in our project, write a simple card in a document or spreadsheet for Sweety to put on the Learning page:
+
+
+
+* **Sign Label:** HELLO
+
+* **English Meaning:** A friendly greeting when meeting someone.
+
+* **Hindi Meaning:** नमस्ते / अभिवादन
+
+* **Step-by-Step Instructions:** Raise your dominant hand to temple level with palm facing outward, and wave gently side-to-side.
+
+* **Difficulty:** Easy
+
+* **Video Reference Link:** (Add link to a short clip showing how to perform it)
+
+
+
+#### Step 4: Write the Project Report
+
+You will draft the main text for the final project report:
+
+1. **Problem Statement:** Why sign language translation and learning tools are needed.
+
+2. **Existing vs Proposed System:** How ISL Connect works using a web camera without expensive hardware gloves.
+
+3. **Dataset Details:** Where we got our dataset, how many samples we used, and known scope limits (e.g., word-level recognition only).
+
+
+
+---
+
+
+
+### 4. Who You Collaborate With & How
+
+* **With Madhu (AI Developer):** Give her the organized dataset folder and make sure label names match exactly (e.g., `THANK_YOU`, not `ThankYou` or `thank_you`).
+
+* **With Sweety (Frontend):** Send her the written learning content, Hindi/English descriptions, and video links for the website cards.
+
+* **With Pooja (Backend):** Share your list of lesson IDs so she can set up the database fields correctly.
+
+* **With Meenakshi (QA Tester):** Provide her with the correct sign guides so she knows if the camera recognition is testing the right signs.
+
+
+
+---
+
+
+
+### 5. Final Checklist Before Submission
+
+- [ ] 10–20 ISL signs verified and documented in a master sheet.
+
+- [ ] Clean dataset organized in folders and shared with Madhu.
+
+- [ ] English and Hindi instructions written for all signs for the Learning page.
+
+- [ ] Written project report sections drafted clearly.

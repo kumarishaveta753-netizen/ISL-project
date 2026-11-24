@@ -1,0 +1,303 @@
+# ISL Connect – Beginner's Guide for Sweety
+
+## Role: Frontend Developer
+
+
+
+---
+
+
+
+### 1. Welcome & Simple Project Overview
+
+Welcome to ISL Connect! You build everything the user sees and clicks on their screen. You create the visual layout, turn on the webcam preview, display the live translation output, design the interactive learning/practice modules, and show progress stats.
+
+
+
+**Important Rule (Scope):**
+
+Our first version (MVP) supports **10 to 20 signs**. Keep the screens simple, clean, and fast!
+
+
+
+**Your Job in 2 Sentences:**
+
+You write HTML for page structure, CSS for modern styling, and JavaScript to open the webcam and send data back and forth to Pooja's Flask backend.
+
+
+
+---
+
+
+
+### 2. Tools You Will Use & Why
+
+* **HTML5:** To build the structure of pages (buttons, video containers, headings, text boxes).
+
+* **CSS3 / Bootstrap or Tailwind CSS:** To make the pages look modern, colorful, clean, and mobile-friendly.
+
+* **JavaScript (ES6+):** To control the webcam, trigger speech features, and send/receive data asynchronously without reloading the page.
+
+* **VS Code:** Your code editor.
+
+* **Browser Developer Tools (F12 in Chrome):** To inspect elements, check for JavaScript errors, and test mobile view sizes.
+
+
+
+---
+
+
+
+### 3. Step-by-Step Task Guide
+
+
+
+#### Step 1: Design Page Navigation Layout
+
+Create a header navigation bar that allows users to seamlessly switch between 4 main views:
+
+1. **Communication Page (Home):** Webcam feed, live transcript box, text-to-speech button.
+
+2. **Learning Page:** Lesson cards with descriptions, video links, and English/Hindi instructions.
+
+3. **Practice Page:** Webcam practice area where users copy signs and see if they pass.
+
+4. **Progress Dashboard:** Simple statistics charts showing completed lessons and accuracy scores.
+
+
+
+#### Step 2: Build the Webcam View & Controls (`index.html`)
+
+In your HTML file, add a video preview box and buttons:
+
+
+
+```html
+
+<div class="container">
+
+    <h2>ISL Real-Time Communication</h2>
+
+    
+
+    <!-- Video Element for Webcam -->
+
+    <video id="webcam" autoplay playsinline width="640" height="480"></video>
+
+    
+
+    <div>
+
+        <button id="startBtn" onclick="startCamera()">Start Camera</button>
+
+        <button id="stopBtn" onclick="stopCamera()">Stop Camera</button>
+
+    </div>
+
+
+
+    <!-- Output Box -->
+
+    <div class="result-box">
+
+        <h3>Recognized Sign: <span id="signLabel">Waiting...</span></h3>
+
+        <p>Confidence: <span id="confidenceScore">0%</span></p>
+
+    </div>
+
+    
+
+    <!-- Transcript Text Area -->
+
+    <textarea id="transcript" placeholder="Translated sentence will appear here..."></textarea>
+
+    <button onclick="speakTranscript()">🔊 Listen (Text-to-Speech)</button>
+
+</div>
+
+```
+
+
+
+#### Step 3: Open the Camera with JavaScript (`static/js/main.js`)
+
+Write code to request webcam permission and show live video stream:
+
+
+
+```javascript
+
+let video = document.getElementById('webcam');
+
+let stream = null;
+
+
+
+async function startCamera() {
+
+    try {
+
+        stream = await navigator.mediaDevices.getUserMedia({ video: true });
+
+        video.srcObject = stream;
+
+        console.log("Webcam connected!");
+
+    } catch (error) {
+
+        alert("Camera permission denied or no camera found.");
+
+        console.error("Camera Error:", error);
+
+    }
+
+}
+
+
+
+function stopCamera() {
+
+    if (stream) {
+
+        stream.getTracks().forEach(track => track.stop());
+
+        video.srcObject = null;
+
+    }
+
+}
+
+```
+
+
+
+#### Step 4: Talk to Pooja's Backend (`/predict`)
+
+Send requests to Pooja's Flask server and handle responses:
+
+
+
+```javascript
+
+async function getSignPrediction(landmarkData) {
+
+    try {
+
+        const response = await fetch('/predict', {
+
+            method: 'POST',
+
+            headers: { 'Content-Type': 'application/json' },
+
+            body: JSON.stringify({ landmarks: landmarkData })
+
+        });
+
+
+
+        const result = await response.json(); // { status, label, confidence }
+
+
+
+        if (result.status === "recognized") {
+
+            document.getElementById('signLabel').innerText = result.label;
+
+            document.getElementById('confidenceScore').innerText = (result.confidence * 100) + "%";
+
+            appendToTranscript(result.label);
+
+        } else if (result.status === "uncertain") {
+
+            showConfirmationModal(result.label); // Open pop-up window
+
+        } else if (result.status === "no_hand") {
+
+            document.getElementById('signLabel').innerText = "No hand detected";
+
+        }
+
+    } catch (err) {
+
+        console.error("Failed to connect to backend:", err);
+
+    }
+
+}
+
+```
+
+
+
+#### Step 5: Build the Uncertainty Pop-up Modal
+
+When prediction status is `"uncertain"`, display a small pop-up modal asking the user to choose:
+
+* **Button 1:** "Confirm [Sign]"
+
+* **Button 2:** "Choose Correct Sign" (opens a dropdown)
+
+* **Button 3:** "Repeat Sign"
+
+
+
+#### Step 6: Add Text-to-Speech (TTS)
+
+Use the browser's built-in Web Speech API to speak the transcript:
+
+
+
+```javascript
+
+function speakTranscript() {
+
+    let text = document.getElementById('transcript').value;
+
+    if (text.trim() !== "") {
+
+        let utterance = new SpeechSynthesisUtterance(text);
+
+        utterance.lang = 'en-IN'; // Indian English Accent
+
+        window.speechSynthesis.speak(utterance);
+
+    }
+
+}
+
+```
+
+
+
+---
+
+
+
+### 4. Who You Collaborate With & How
+
+* **With Pooja (Backend):** Make sure your `fetch()` route names match her Flask routes exactly (e.g., `/predict`, `/confirm-sign`).
+
+* **With Madhu (AI Developer):** Ask her what status words her model returns (`recognized`, `uncertain`, `no_hand`) so your UI handles them.
+
+* **With Shaveta (Data Lead):** Get lesson text, Hindi translations, and video links from her to build the Learning page cards.
+
+* **With Meenakshi (QA):** When she finds visual bugs or broken buttons, fix them in HTML/CSS/JS and update her.
+
+
+
+---
+
+
+
+### 5. Final Checklist Before Submission
+
+- [ ] Navigation bar allows switching between Communication, Learn, Practice, and Progress views.
+
+- [ ] Webcam turns on/off cleanly with user permission checks.
+
+- [ ] UI calls `/predict` endpoint and updates transcript text.
+
+- [ ] Uncertainty modal pop-up opens correctly when needed.
+
+- [ ] Text-to-speech button speaks transcript aloud.

@@ -1,0 +1,335 @@
+# ISL Connect – Beginner's Guide for Pooja Sharma
+
+## Role: Team Leader & Backend Developer
+
+
+
+---
+
+
+
+### 1. Welcome & Simple Project Overview
+
+Welcome to ISL Connect! Think of this website like a digital bridge. A user turns on their web camera, performs Indian Sign Language (ISL) hand signs, and the computer translates those signs into text and speech. The website also lets people learn signs through videos and practice them using the camera.
+
+
+
+**Important Rule (Scope):** 
+
+Our first version (MVP - Minimum Viable Product) only supports **10 to 20 signs**. We are NOT translating full grammar or full sentences yet.
+
+
+
+**Your Job in 2 Sentences:**
+
+1. **As Team Leader:** You organize the team, set deadlines, and make sure everyone works together smoothly.
+
+2. **As Backend Developer:** You build the central server (using Flask) that receives camera data from Sweety (Frontend), asks Madhu's AI model what sign it is, saves user progress in a database, and sends answers back to the browser.
+
+
+
+---
+
+
+
+### 2. Tools You Will Use & Why
+
+* **Python (3.10 or higher):** The primary programming language for our backend logic.
+
+* **Flask:** A simple Python framework used to create web servers and API routes.
+
+* **VS Code (Visual Studio Code):** The code editor where you will write your Python code.
+
+* **SQLite:** A small, built-in database that stores user progress in a single file on your computer.
+
+* **Postman / Hoppscotch:** Free desktop/web tools used to test your backend endpoints to ensure they work before connecting them to Sweety's website.
+
+* **GitHub:** A website where you and your team upload and share code safely.
+
+
+
+---
+
+
+
+### 3. Step-by-Step Task Guide
+
+
+
+#### Step 1: Manage the Team (Leadership)
+
+* **Set up GitHub:** Create a GitHub repository (folder) named `isl-connect` and invite Shaveta, Madhu, Sweety, and Meenakshi.
+
+* **Daily Meetings (Standup):** Hold a 10-minute chat every day with 3 simple questions:
+
+  1. What did you finish yesterday?
+
+  2. What are you working on today?
+
+  3. Is anything stopping or blocking you?
+
+* **Keep Scope Small:** If someone wants to add 50 signs or complex features, gently say: *"Let's finish our 10-20 signs first!"*
+
+
+
+#### Step 2: Set Up Your Computer Environment
+
+1. Open your terminal or command prompt.
+
+2. Create a project folder and navigate inside:
+
+   ```bash
+
+   mkdir isl_connect
+
+   cd isl_connect
+
+   ```
+
+3. Create a virtual environment (a clean Python box for your project):
+
+   ```bash
+
+   python -m venv venv
+
+   ```
+
+4. Activate it:
+
+   * **Windows:** `venv\Scripts\activate`
+
+   * **Mac/Linux:** `source venv/bin/activate`
+
+5. Install Flask and CORS support:
+
+   ```bash
+
+   pip install flask flask-cors sqlite3 numpy
+
+   ```
+
+
+
+#### Step 3: Create the Project Folder Structure
+
+Set up your project folders in VS Code like this:
+
+```text
+
+isl_connect/
+
+├── app.py               <-- Main file that runs your web server
+
+├── model/               <-- Place Madhu's AI model file here (.pkl or .h5)
+
+├── database/            <-- Place SQLite database setup here
+
+├── templates/           <-- HTML pages created by Sweety
+
+├── static/              <-- CSS, JS, and image files created by Sweety
+
+└── requirements.txt     <-- List of software packages used
+
+```
+
+
+
+#### Step 4: Write Your First Flask Server (`app.py`)
+
+Create `app.py` and write this simple starter code:
+
+
+
+```python
+
+from flask import Flask, render_template, jsonify, request
+
+from flask_cors import CORS
+
+
+
+app = Flask(__name__)
+
+CORS(app)  # Allows Sweety's frontend to talk to your backend without web blocks
+
+
+
+@app.route('/')
+
+def home():
+
+    return render_template('index.html')  # Loads Sweety's main page
+
+
+
+@app.route('/health', methods=['GET'])
+
+def health_check():
+
+    return jsonify({"status": "Backend server is running smoothly!"})
+
+
+
+if __name__ == '__main__':
+
+    app.run(debug=True, port=5000)
+
+```
+
+Run it in your terminal with `python app.py` and open `http://127.0.0.1:5000` in your browser.
+
+
+
+#### Step 5: Build API Routes (How Frontend Talks to Backend)
+
+You need to create specific web addresses (called routes or endpoints) that Sweety's frontend code can call:
+
+
+
+1. **Prediction Route (`/predict`):** Receives camera landmarks, sends them to Madhu's AI model, and returns the result.
+
+   ```python
+
+   @app.route('/predict', methods=['POST'])
+
+   def predict_sign():
+
+       data = request.get_json()
+
+       
+
+       if not data or 'landmarks' not in data:
+
+           return jsonify({"error": "No hand data received"}), 400
+
+       
+
+       # Pass landmarks to Madhu's model function
+
+       # Example output format:
+
+       return jsonify({
+
+           "status": "recognized",   # Options: recognized, uncertain, no_hand
+
+           "label": "HELLO",
+
+           "confidence": 0.92
+
+       })
+
+   ```
+
+
+
+2. **Confirmation Route (`/confirm-sign`):** Triggered when a prediction is low confidence and the user clicks a choice in Sweety's pop-up menu.
+
+   ```python
+
+   @app.route('/confirm-sign', methods=['POST'])
+
+   def confirm_sign():
+
+       data = request.get_json()
+
+       user_action = data.get('action') # 'confirm', 'correct', or 'repeat'
+
+       selected_sign = data.get('sign')
+
+       
+
+       return jsonify({
+
+           "status": "success",
+
+           "message": f"Sign {selected_sign} updated based on user action: {user_action}"
+
+       })
+
+   ```
+
+
+
+#### Step 6: Set Up the Database (SQLite)
+
+Create a file inside `database/db_setup.py`:
+
+```python
+
+import sqlite3
+
+
+
+def init_db():
+
+    conn = sqlite3.connect('isl_connect.db')
+
+    cursor = conn.cursor()
+
+    
+
+    # Table to track lessons completed by user
+
+    cursor.execute('''
+
+        CREATE TABLE IF NOT EXISTS progress (
+
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+            lesson_id INTEGER,
+
+            lesson_title TEXT,
+
+            status TEXT
+
+        )
+
+    ''')
+
+    
+
+    conn.commit()
+
+    conn.close()
+
+
+
+if __name__ == '__main__':
+
+    init_db()
+
+    print("Database and tables created successfully!")
+
+```
+
+
+
+---
+
+
+
+### 4. Who You Collaborate With & How
+
+* **With Sweety (Frontend):** Tell her the exact names of your routes (like `/predict`) and agree on what JSON format data should look like.
+
+* **With Madhu (AI Developer):** Put her trained model file inside your `model/` folder and import her function to get predictions.
+
+* **With Shaveta (Content Lead):** Ask her for the list of lesson names and practice sign names so your database tables match her content.
+
+* **With Meenakshi (QA Tester):** When she finds a backend bug, fix it in `app.py` and let her know to re-test it.
+
+
+
+---
+
+
+
+### 5. Final Checklist Before Submission
+
+- [ ] Flask server runs locally without crashing.
+
+- [ ] `/predict` endpoint receives input and returns JSON data.
+
+- [ ] SQLite database creates tables and stores user progress.
+
+- [ ] GitHub repository is organized and updated daily.
